@@ -3,10 +3,31 @@
 #include <iostream>
 #include "Source.h"
 
+GLFWwindow* window = nullptr;
+unsigned int vertexShaderID = 0;
+unsigned int vertexShaderID2 = 0;
+
+unsigned int fragmentShaderID = 0;
+unsigned int fragmentShaderID2 = 0;
+
+unsigned int triangleVAO = 0;
+unsigned int triangle2VAO = 0;
+
+unsigned int shaderProgramID = 0;
+unsigned int shaderProgramID2 = 0;
+
+bool isWireFrameMode = false;
+
 float triangleVertices[] = {
-	 -0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.0f,  0.5f, 0.0f
+	 -1.0f, -0.5f, 0.0f,
+	 0.0f, -0.5f, 0.0f,
+	 -0.5f,  0.5f, 0.0f
+};
+
+float triangleVertices2[] = {
+	 0.0f, -0.5f, 0.0f,
+	 1.0f, -0.5f, 0.0f,
+	 0.5f,  0.5f, 0.0f
 };
 
 float rectangleVertices[] = {
@@ -66,12 +87,29 @@ void OnWindowResized(GLFWwindow* window, int width, int height)
 	InitViewport(0, 0, width, height);
 }
 
+void EnableWireFrameMode(bool enable)
+{
+	if (enable == true)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+}
+
 void ProcessInput(GLFWwindow* window)
 {
 	//if it's not pressed, glfwGetKey returns GLFW_RELEASE
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+	else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+	{
+		isWireFrameMode = !isWireFrameMode;
+		EnableWireFrameMode(isWireFrameMode);
 	}
 }
 
@@ -85,8 +123,14 @@ void RenderLoop(GLFWwindow* window)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
 		glClear(GL_COLOR_BUFFER_BIT); //clear Color_Buffer using clear color
 
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glUseProgram(shaderProgramID);
+		glBindVertexArray(triangleVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glUseProgram(shaderProgramID2);
+		glBindVertexArray(triangle2VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwPollEvents(); //checks if any events are triggered (like keyboard input or mouse movement events), updates the window state, and calls the corresponding functions (which we can register via callback methods)
 		glfwSwapBuffers(window); //swap the color buffer (a large 2D buffer that contains color values for each pixel in GLFW's window) that is used to render to during this render iteration and show it as output to the screen.
@@ -99,22 +143,21 @@ void Clear()
 	glfwTerminate();
 }
 
-void InitVertexArrayObject()
+void InitVertexArrayObject(unsigned int& VAO)
 {
 	//stores our vertex attribute configuration and which VBO to use
 	//when you have multiple objects you want to draw, you first generate/configure all the VAOs (and thus the required VBO and attribute pointers)
 	//and store those for later use. The moment we want to draw one of our objects, we take the corresponding VAO, bind it, then draw the object and unbind the VAO again.
-	unsigned int VAO = 0;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 }
 
-void InitVertexBuffer()
+void InitVertexBuffer(int verticesSize, const void* vertices)
 {
 	unsigned int VBO = 0;
 	glGenBuffers(1, &VBO); //Generate Buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //bind buffer at GL_ARRAY_BUFFER 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW); //set data to GL_ARRAY_BUFFER, stored data in memory on graphics card
+	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW); //set data to GL_ARRAY_BUFFER, stored data in memory on graphics card
 }
 
 void InitVertexAttributes()
@@ -179,25 +222,17 @@ void InitVertexShader(unsigned int& vertexShaderID)
 	CheckShaderCompile(vertexShaderID);
 }
 
-void InitFragmentShader(unsigned int& fragmentShaderID)
+void InitFragmentShader(unsigned int& fragmentShaderID, const char* fragmentShaderSource)
 {
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0 ";
-
 	CreateAndCompileShader(fragmentShaderID, fragmentShaderSource, GL_FRAGMENT_SHADER);
 	CheckShaderCompile(fragmentShaderID);
 }
 
-void InitShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID)
+void InitShaderProgram(unsigned int& shaderProgramID, unsigned int vertexShaderID, unsigned int fragmentShaderID)
 {
 	//A shader program object is the final linked version of multiple shaders combined. 
 	//To use the recently compiled shaders we have to link them to a shader program object and then activate this shader program when rendering objects. 
 	//The activated shader program's shaders will be used when we issue render calls.
-	unsigned int shaderProgramID = 0;
 	shaderProgramID = glCreateProgram();
 	glAttachShader(shaderProgramID, vertexShaderID);
 	glAttachShader(shaderProgramID, fragmentShaderID);
@@ -210,27 +245,12 @@ void InitShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderI
 	glDeleteShader(fragmentShaderID);
 }
 
-void EnableWireFrameMode(bool enable)
-{
-	if (enable == true)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-}
+
 
 
 int main()
 {
 	InitGLFW();
-
-	GLFWwindow* window = nullptr;
-	unsigned int vertexShaderID = 0;
-	unsigned int fragmentShaderID = 0;
-
 
 	bool result = CreateGLFWWindow(&window);
 	if (result == false)
@@ -253,31 +273,48 @@ int main()
 
 
 	// 1. bind Vertex Array Object
-	InitVertexArrayObject();
+	InitVertexArrayObject(triangleVAO);
 
 	// 2. copy our vertices array in a buffer for OpenGL to use
-	InitVertexBuffer();
+	InitVertexBuffer(sizeof(triangleVertices), triangleVertices);
 
 	// 3. copy our index array in a element buffer for OpenGL to use
-	InitElementBufferObject();
+	//InitElementBufferObject();
 
 	// 4. then set the vertex attributes pointers
 	InitVertexAttributes();
 
 
-
-
+	InitVertexArrayObject(triangle2VAO);
+	InitVertexBuffer(sizeof(triangleVertices2), triangleVertices2);
+	InitVertexAttributes();
 
 
 
 
 	// 4. use our shader program when we want to render an object
 	InitVertexShader(vertexShaderID);
-	InitFragmentShader(fragmentShaderID);	
-	InitShaderProgram(vertexShaderID, fragmentShaderID);
+	InitFragmentShader(fragmentShaderID, "#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main()\n"
+		"{\n"
+		"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+		"}\0 "
+	);
+	InitShaderProgram(shaderProgramID, vertexShaderID, fragmentShaderID);
 	
 
-	EnableWireFrameMode(true);
+	InitVertexShader(vertexShaderID2);
+	InitFragmentShader(fragmentShaderID2, "#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main()\n"
+		"{\n"
+		"FragColor = vec4(0.0f, 0.5f, 0.2f, 1.0f);\n"
+		"}\0 "
+	);
+	InitShaderProgram(shaderProgramID2, vertexShaderID2, fragmentShaderID2);
+
+	
 
 	// 5. now draw the object 
 	RenderLoop(window);
