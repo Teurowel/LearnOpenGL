@@ -1,0 +1,6 @@
+Once your vertex coordinates have been processed in the vertex shader, 
+they should be in normalized device coordinates which is a small space where the x, y and z values vary from -1.0 to 1.0. 
+Any coordinates that fall outside this range will be discarded/clipped and won't be visible on your screen. 
+
+Your NDC coordinates will then be transformed to screen-space coordinates via the viewport transform using the data you provided with glViewport. 
+The resulting screen-space coordinates are then transformed to fragments as inputs to your fragment shader.

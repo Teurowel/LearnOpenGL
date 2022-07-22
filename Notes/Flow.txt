@@ -1,0 +1,15 @@
+Setup GLFW, GLAD
+Setup Viewport
+
+InitVertexArrayObject(Will store vertex attribute and VBO)
+InitVertexBuffer(make buffer in GPU and set vertex data)
+InitVertexAttributes(How to interpret veretx data)
+
+
+InitVertexShader(Create shader and compile it)
+InitFragmentShader
+InitShaderProgram(Link all shaders)
+
+
+Set VAO
+Draw

@@ -1,0 +1,22 @@
+PipeLine
+*Vertex Shader -> Shape Assembly(Primitve Assembly) -> *Geometry Shader -> Rasterization -> *Fragment Shader -> Test and Blending
+
+each handle one specific part of converting your vertex data to a fully rendered pixel.
+
+we pass in a list of three 3D coordinates that should form a triangle in an array here called Vertex Data; 
+this vertex data is a collection of vertices
+
+A vertex is a collection of data per 3D coordinate. This vertex's data is represented using vertex attributes
+
+
+
+VertexShader : takes as input a single vertex. The main purpose of the vertex shader is to transform 3D coordinates into different 3D coordinates
+Primitive Assembly : takes as input all the vertices from the vertex shader that form a primitive and assembles all the point(s) in the primitive shape given(triangle)
+Geometry Shader : takes as input a collection of vertices that form a primitive and has the ability to generate other shapes by emitting new vertices to form new (or other) primitive(s)
+Rasterization Stage : it maps the resulting primitive(s) to the corresponding pixels on the final screen, resulting in fragments for the fragment shader to use.
+		      Before the fragment shaders run, clipping is performed. Clipping discards all fragments that are outside your view, increasing performance.
+fragment : in OpenGL, it is all the data required for OpenGL to render a single pixel.
+Fragment Shader : calculate the final color of a pixel and this is usually the stage where all the advanced OpenGL effects occur. Usually the fragment shader contains data about the 3D scene that it can use to calculate the final pixel color (like lights, shadows, color of the light and so on).
+Alpha test and Blending stage : After all the corresponding color values have been determined, the final object will then pass through this stage.
+				This stage checks the corresponding depth (and stencil) value (we'll get to those later) of the fragment and uses those to check if the resulting fragment is in front or behind other objects and should be discarded accordingly
+				The stage also checks for alpha values (alpha values define the opacity of an object) and blends the objects accordingly. So even if a pixel output color is calculated in the fragment shader, the final pixel color could still be something entirely different when rendering multiple triangles.
