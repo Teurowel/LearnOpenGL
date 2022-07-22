@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Source.h"
+#include "Shader.h"
 
 GLFWwindow* window = nullptr;
 unsigned int vertexShaderID = 0;
@@ -13,21 +14,20 @@ unsigned int fragmentShaderID2 = 0;
 unsigned int triangleVAO = 0;
 unsigned int triangle2VAO = 0;
 
-unsigned int shaderProgramID = 0;
-unsigned int shaderProgramID2 = 0;
+Shader shader;
 
 bool isWireFrameMode = false;
 
 float triangleVertices[] = {
-	 -1.0f, -0.5f, 0.0f,
-	 0.0f, -0.5f, 0.0f,
-	 -0.5f,  0.5f, 0.0f
+	 -1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,
+	 0.0f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f,
+	 -0.5f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f
 };
 
 float triangleVertices2[] = {
-	 0.0f, -0.5f, 0.0f,
-	 1.0f, -0.5f, 0.0f,
-	 0.5f,  0.5f, 0.0f
+	 0.0f, -0.5f, 0.0f,		1.0f, 0.0f, 0.0f,
+	 1.0f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f,
+	 0.5f,  0.5f, 0.0f,		0.0f, 0.0f, 1.0f
 };
 
 float rectangleVertices[] = {
@@ -113,21 +113,32 @@ void ProcessInput(GLFWwindow* window)
 	}
 }
 
+void ClearBuffer()
+{
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
+	glClear(GL_COLOR_BUFFER_BIT); //clear Color_Buffer using clear color
+}
+
 void RenderLoop(GLFWwindow* window)
 {
 	while (glfwWindowShouldClose(window) == false)
 	{
 		ProcessInput(window);
 
-		//rendering commnads here
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
-		glClear(GL_COLOR_BUFFER_BIT); //clear Color_Buffer using clear color
+		ClearBuffer();
 
-		glUseProgram(shaderProgramID);
+		shader.Use();
+		shader.SetFloat("horizontalOffset", 0.2f);
 		glBindVertexArray(triangleVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		glUseProgram(shaderProgramID2);
+		//float timeValue = glfwGetTime();
+		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		//int vertexColorLocation = glGetUniformLocation(shaderProgramID2, "ourColor");
+		
+		//Note that finding the uniform location does not require you to use the shader program first, but updating a uniform does require you to first use the program(by calling glUseProgram), because it sets the uniform on the currently active shader program.
+		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		
 		glBindVertexArray(triangle2VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -164,8 +175,14 @@ void InitVertexAttributes()
 {
 	//Each vertex attribute takes its data from memory managed by a VBO and which VBO it takes its data from (you can have multiple VBOs) is determined by the VBO currently bound to GL_ARRAY_BUFFER when calling glVertexAttribPointer
 	//we specified how OpenGL should interpret the vertex data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
+
+	//Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
 }
 
 void InitElementBufferObject()
@@ -176,76 +193,6 @@ void InitElementBufferObject()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
 }
-
-void CheckShaderCompile(unsigned int shaderID)
-{
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-}
-
-void CheckShaderProgramLink(unsigned int shaderProgramID)
-{
-	int  success;
-	char infoLog[512];
-	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgramID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADERPROGRAM::LINK_FAILED\n" << infoLog << std::endl;
-	}
-}
-
-void CreateAndCompileShader(unsigned int& shaderID, const char* shaderSource, GLenum shaderType)
-{
-	shaderID = glCreateShader(shaderType); //Create vertex shader
-	glShaderSource(shaderID, 1, &shaderSource, nullptr); //attach shader source 
-	glCompileShader(shaderID); //compile vertex shader
-}
-
-void InitVertexShader(unsigned int& vertexShaderID)
-{
-	const char* vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-	"}\0";
-
-	//In order for OpenGL to use the shader it has to dynamically compile it at run-time from its source code
-	CreateAndCompileShader(vertexShaderID, vertexShaderSource, GL_VERTEX_SHADER);
-	CheckShaderCompile(vertexShaderID);
-}
-
-void InitFragmentShader(unsigned int& fragmentShaderID, const char* fragmentShaderSource)
-{
-	CreateAndCompileShader(fragmentShaderID, fragmentShaderSource, GL_FRAGMENT_SHADER);
-	CheckShaderCompile(fragmentShaderID);
-}
-
-void InitShaderProgram(unsigned int& shaderProgramID, unsigned int vertexShaderID, unsigned int fragmentShaderID)
-{
-	//A shader program object is the final linked version of multiple shaders combined. 
-	//To use the recently compiled shaders we have to link them to a shader program object and then activate this shader program when rendering objects. 
-	//The activated shader program's shaders will be used when we issue render calls.
-	shaderProgramID = glCreateProgram();
-	glAttachShader(shaderProgramID, vertexShaderID);
-	glAttachShader(shaderProgramID, fragmentShaderID);
-	glLinkProgram(shaderProgramID);
-	glUseProgram(shaderProgramID); //Activate shader program, Every shader and rendering call after glUseProgram will now use this program object (and thus the shaders).
-
-	CheckShaderProgramLink(shaderProgramID);
-
-	glDeleteShader(vertexShaderID); //once we've linked them into the program object; we no longer need them anymore:
-	glDeleteShader(fragmentShaderID);
-}
-
-
 
 
 int main()
@@ -270,8 +217,6 @@ int main()
 	glfwSetFramebufferSizeCallback(window, OnWindowResized);
 
 
-
-
 	// 1. bind Vertex Array Object
 	InitVertexArrayObject(triangleVAO);
 
@@ -289,31 +234,8 @@ int main()
 	InitVertexBuffer(sizeof(triangleVertices2), triangleVertices2);
 	InitVertexAttributes();
 
-
-
-
-	// 4. use our shader program when we want to render an object
-	InitVertexShader(vertexShaderID);
-	InitFragmentShader(fragmentShaderID, "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0 "
-	);
-	InitShaderProgram(shaderProgramID, vertexShaderID, fragmentShaderID);
 	
-
-	InitVertexShader(vertexShaderID2);
-	InitFragmentShader(fragmentShaderID2, "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"FragColor = vec4(0.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0 "
-	);
-	InitShaderProgram(shaderProgramID2, vertexShaderID2, fragmentShaderID2);
-
+	shader.InitShader("shader.vs", "shader.fs");
 	
 
 	// 5. now draw the object 
