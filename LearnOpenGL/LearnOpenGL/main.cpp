@@ -1,13 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
+
 #include "Shader.h"
 #include "stb_image.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-GLFWwindow* window = nullptr;
+#include "Game.h"
+#include "Camera.h"
+
+
 unsigned int vertexShaderID = 0;
 unsigned int vertexShaderID2 = 0;
 
@@ -28,13 +31,7 @@ unsigned int EBO = 0;
 unsigned int texture1 = 0;
 unsigned int texture2 = 0;
 
-Shader shader;
 
-bool isWireFrameMode = false;
-float textureInterpolationValue = 0.0f;
-
-float screenWidth = 800.0f;
-float screenHeight = 600.0f;
 
 float triangleVertices[] = {
 	 -1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,
@@ -123,184 +120,6 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-void InitGLFW()
-{
-	glfwInit(); //initialize GLFW
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //what option we want to configure, https://www.glfw.org/docs/latest/window.html#window_hints
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-bool CreateGLFWWindow(GLFWwindow** window)
-{
-	*window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", NULL, NULL);
-	if (*window == NULL)
-	{
-		std::cout << "Failed to create GLFW widnow" << std::endl;
-		glfwTerminate();
-		return false;
-	}
-	glfwMakeContextCurrent(*window);
-	return true;
-}
-
-bool InitGLAD()
-{
-	if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == false)
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return false;
-	}
-
-	return true;
-}
-
-
-void InitViewport(int x, int y, int width, int height)
-{
-	//tell OpenGL the size of the rendering window
-	//processed coordinates in OpenGL are between -1 and 1 so we effectively map from the range (-1 to 1) to (0, 800) and (0, 600).
-	//(-0.5,0.5) would be mapped to (200,450)
-	glViewport(x, y, width, height); //location of the lower left corner, width and height of the rendering window in pixels
-}
-
-void OnWindowResized(GLFWwindow* window, int width, int height)
-{
-	std::cout << "OnWindowResized" << std::endl;
-	InitViewport(0, 0, width, height);
-}
-
-void InitSystem()
-{
-	InitViewport(0, 0, 800, 600);
-
-	glEnable(GL_DEPTH_TEST);
-
-	//call this function on every window resize by registering it
-	glfwSetFramebufferSizeCallback(window, OnWindowResized);
-}
-
-
-
-void EnableWireFrameMode(bool enable)
-{
-	if (enable == true)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-}
-
-void ProcessInput(GLFWwindow* window)
-{
-	//if it's not pressed, glfwGetKey returns GLFW_RELEASE
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-	}
-	else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-	{
-		isWireFrameMode = !isWireFrameMode;
-		EnableWireFrameMode(isWireFrameMode);
-	}
-	else if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS))
-	{
-		textureInterpolationValue += 0.01f;
-		if (textureInterpolationValue > 1.0f)
-		{
-			textureInterpolationValue = 1.0f;
-		}
-	}
-	else if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS))
-	{
-		textureInterpolationValue -= 0.01f;
-		if (textureInterpolationValue < 0.0f)
-		{
-			textureInterpolationValue = 0.0f;
-		}
-	}
-}
-
-void ClearBuffer()
-{
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
-}
-
-void RenderLoop(GLFWwindow* window)
-{
-	shader.Use(); // don't forget to activate/use the shader before setting uniforms!
-
-	//Set sampler's texture unit
-	shader.SetInt("texture1", 0);
-	shader.SetInt("texture2", 1);
-
-	
-
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), (screenWidth + 300)/ screenHeight, 0.1f, 100.0f);
-
-
-	while (glfwWindowShouldClose(window) == false)
-	{
-		ProcessInput(window);
-
-		ClearBuffer();
-
-		//glBindVertexArray(triangleVAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		//float timeValue = glfwGetTime();
-		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		//int vertexColorLocation = glGetUniformLocation(shaderProgramID2, "ourColor");
-		
-		//Note that finding the uniform location does not require you to use the shader program first, but updating a uniform does require you to first use the program(by calling glUseProgram), because it sets the uniform on the currently active shader program.
-		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-		
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-
-		shader.Use();
-		shader.SetFloat("textureInterpolation", textureInterpolationValue);
-
-
-		shader.SetMatrix("view", view);
-		shader.SetMatrix("projection", projection);
-		//glm::mat4 trans = glm::mat4(1.0f);
-		//trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		//std::cout << (float)glfwGetTime() << std::endl;
-		////trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		//shader.SetMatrix("transform", trans);
-		glBindVertexArray(cubeVAO);
-		for (unsigned int i = 0; i < 10; ++i)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			shader.SetMatrix("model", model);
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		glfwSwapBuffers(window); //swap the color buffer (a large 2D buffer that contains color values for each pixel in GLFW's window) that is used to render to during this render iteration and show it as output to the screen.
-		glfwPollEvents(); //checks if any events are triggered (like keyboard input or mouse movement events), updates the window state, and calls the corresponding functions (which we can register via callback methods)		
-	}
-}
-
 void Clear()
 {
 	glDeleteVertexArrays(1, &rectangleVAO);
@@ -309,8 +128,6 @@ void Clear()
 
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
-
-	glfwTerminate();
 }
 
 void InitVertexArrayObject(unsigned int& VAO)
@@ -416,23 +233,29 @@ void InitTexture(const char* texturePath, unsigned int& textureID, GLenum source
 }
 
 
+Game game;
+Shader shader;
+
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+void GameLoop(GLFWwindow* window);
+
+void SetCallbacks(GLFWwindow* window);
+void OnWindowResized(GLFWwindow* window, int width, int height);
+void OnMouseMove(GLFWwindow* window, double xpos, double ypos);
+void OnMouseScroll(GLFWwindow* window, double xOffset, double yOffset);
+
 int main()
 {
-	InitGLFW();
-
-	bool result = CreateGLFWWindow(&window);
+	bool result = game.Init();
 	if (result == false)
 	{
 		return -1;
 	}
 
-	result = InitGLAD();
-	if (result == false)
-	{
-		return -1;
-	}
-
-	InitSystem();
+	//call this function on every window resize by registering it
+	SetCallbacks(game.GetWindow());
 
 	// 1. bind Vertex Array Object
 	InitVertexArrayObject(cubeVAO);
@@ -457,13 +280,87 @@ int main()
 	InitTexture("Texture/container.jpg", texture1, GL_RGB);
 	InitTexture("Texture/awesomeface.png", texture2, GL_RGBA);
 
-	
 
 	// 5. now draw the object 
-	RenderLoop(window);
+	GameLoop(game.GetWindow());
 
 	Clear();
+
+	game.Clear();
+
 	return 0;
 }
 
+void GameLoop(GLFWwindow* window)
+{
+	shader.Use(); // don't forget to activate/use the shader before setting uniforms!
 
+	//Set sampler's texture unit
+	shader.SetInt("texture1", 0);
+	shader.SetInt("texture2", 1);
+
+
+	while (glfwWindowShouldClose(window) == false)
+	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		game.Update(deltaTime);
+
+		game.Render();
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+
+		shader.Use();
+		shader.SetMatrix("view", game.GetCamera()->GetViewMatrix());
+		shader.SetMatrix("projection", game.GetCamera()->GetProjMatrix());
+
+		glBindVertexArray(cubeVAO);
+		for (unsigned int i = 0; i < 10; ++i)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+			shader.SetMatrix("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		glfwSwapBuffers(window); //swap the color buffer (a large 2D buffer that contains color values for each pixel in GLFW's window) that is used to render to during this render iteration and show it as output to the screen.
+		glfwPollEvents(); //checks if any events are triggered (like keyboard input or mouse movement events), updates the window state, and calls the corresponding functions (which we can register via callback methods)		
+	}
+}
+
+void SetCallbacks(GLFWwindow* window)
+{
+	glfwSetFramebufferSizeCallback(window, OnWindowResized);
+	glfwSetCursorPosCallback(window, OnMouseMove);
+	glfwSetScrollCallback(window, OnMouseScroll);
+}
+
+void OnWindowResized(GLFWwindow* window, int width, int height)
+{
+	//std::cout << "OnWindowResized" << std::endl;
+	game.OnWindowResized(width, height);
+}
+
+void OnMouseMove(GLFWwindow* window, double xpos, double ypos)
+{
+	//std::cout << "OnMouseMove " << "Xpos : " << xpos << " Ypos : " << ypos << std::endl;
+	game.OnMouseMove(xpos, ypos);
+}
+
+void OnMouseScroll(GLFWwindow* window, double xOffset, double yOffset)
+{
+	//std::cout << "OnMouseScroll" << "yOffset : " << yOffset << std::endl;
+	game.OnMouseScroll(xOffset, yOffset);
+}
