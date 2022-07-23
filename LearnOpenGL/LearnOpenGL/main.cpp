@@ -3,6 +3,9 @@
 #include <iostream>
 #include "Shader.h"
 #include "stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 GLFWwindow* window = nullptr;
 unsigned int vertexShaderID = 0;
@@ -26,6 +29,7 @@ unsigned int texture2 = 0;
 Shader shader;
 
 bool isWireFrameMode = false;
+float textureInterpolationValue = 0.0f;
 
 float triangleVertices[] = {
 	 -1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,
@@ -127,6 +131,22 @@ void ProcessInput(GLFWwindow* window)
 		isWireFrameMode = !isWireFrameMode;
 		EnableWireFrameMode(isWireFrameMode);
 	}
+	else if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS))
+	{
+		textureInterpolationValue += 0.01f;
+		if (textureInterpolationValue > 1.0f)
+		{
+			textureInterpolationValue = 1.0f;
+		}
+	}
+	else if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS))
+	{
+		textureInterpolationValue -= 0.01f;
+		if (textureInterpolationValue < 0.0f)
+		{
+			textureInterpolationValue = 0.0f;
+		}
+	}
 }
 
 void ClearBuffer()
@@ -142,6 +162,8 @@ void RenderLoop(GLFWwindow* window)
 	//Set sampler's texture unit
 	shader.SetInt("texture1", 0);
 	shader.SetInt("texture2", 1);
+
+
 
 	while (glfwWindowShouldClose(window) == false)
 	{
@@ -165,6 +187,15 @@ void RenderLoop(GLFWwindow* window)
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
 		shader.Use();
+		shader.SetFloat("textureInterpolation", textureInterpolationValue);
+
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		
+		std::cout << (float)glfwGetTime() << std::endl;
+		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		shader.SetMatrix("transform", trans);
 		glBindVertexArray(rectangleVAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -322,6 +353,8 @@ int main()
 	
 	InitTexture("Texture/container.jpg", texture1, GL_RGB);
 	InitTexture("Texture/awesomeface.png", texture2, GL_RGBA);
+
+	
 
 	// 5. now draw the object 
 	RenderLoop(window);
