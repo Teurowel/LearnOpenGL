@@ -19,6 +19,8 @@ unsigned int triangle2VAO = 0;
 
 unsigned int rectangleVAO = 0;
 
+unsigned int cubeVAO = 0;
+
 unsigned int VBO = 0;
 
 unsigned int EBO = 0;
@@ -30,6 +32,9 @@ Shader shader;
 
 bool isWireFrameMode = false;
 float textureInterpolationValue = 0.0f;
+
+float screenWidth = 800.0f;
+float screenHeight = 600.0f;
 
 float triangleVertices[] = {
 	 -1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,
@@ -61,6 +66,63 @@ unsigned int rectangleIndices[] = {  // note that we start from 0!
 	1, 2, 3    // second triangle
 };
 
+float cubeVertices[] = {
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
+
+glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 void InitGLFW()
 {
 	glfwInit(); //initialize GLFW
@@ -71,7 +133,7 @@ void InitGLFW()
 
 bool CreateGLFWWindow(GLFWwindow** window)
 {
-	*window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	*window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", NULL, NULL);
 	if (*window == NULL)
 	{
 		std::cout << "Failed to create GLFW widnow" << std::endl;
@@ -93,6 +155,7 @@ bool InitGLAD()
 	return true;
 }
 
+
 void InitViewport(int x, int y, int width, int height)
 {
 	//tell OpenGL the size of the rendering window
@@ -106,6 +169,18 @@ void OnWindowResized(GLFWwindow* window, int width, int height)
 	std::cout << "OnWindowResized" << std::endl;
 	InitViewport(0, 0, width, height);
 }
+
+void InitSystem()
+{
+	InitViewport(0, 0, 800, 600);
+
+	glEnable(GL_DEPTH_TEST);
+
+	//call this function on every window resize by registering it
+	glfwSetFramebufferSizeCallback(window, OnWindowResized);
+}
+
+
 
 void EnableWireFrameMode(bool enable)
 {
@@ -152,7 +227,7 @@ void ProcessInput(GLFWwindow* window)
 void ClearBuffer()
 {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
-	glClear(GL_COLOR_BUFFER_BIT); //clear Color_Buffer using clear color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
 }
 
 void RenderLoop(GLFWwindow* window)
@@ -163,6 +238,13 @@ void RenderLoop(GLFWwindow* window)
 	shader.SetInt("texture1", 0);
 	shader.SetInt("texture2", 1);
 
+	
+
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), (screenWidth + 300)/ screenHeight, 0.1f, 100.0f);
 
 
 	while (glfwWindowShouldClose(window) == false)
@@ -189,15 +271,30 @@ void RenderLoop(GLFWwindow* window)
 		shader.Use();
 		shader.SetFloat("textureInterpolation", textureInterpolationValue);
 
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		
-		std::cout << (float)glfwGetTime() << std::endl;
-		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		shader.SetMatrix("transform", trans);
-		glBindVertexArray(rectangleVAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		shader.SetMatrix("view", view);
+		shader.SetMatrix("projection", projection);
+		//glm::mat4 trans = glm::mat4(1.0f);
+		//trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		//std::cout << (float)glfwGetTime() << std::endl;
+		////trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		//shader.SetMatrix("transform", trans);
+		glBindVertexArray(cubeVAO);
+		for (unsigned int i = 0; i < 10; ++i)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+			shader.SetMatrix("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //swap the color buffer (a large 2D buffer that contains color values for each pixel in GLFW's window) that is used to render to during this render iteration and show it as output to the screen.
 		glfwPollEvents(); //checks if any events are triggered (like keyboard input or mouse movement events), updates the window state, and calls the corresponding functions (which we can register via callback methods)		
@@ -240,19 +337,29 @@ void InitVertexAttributes()
 	////Position attribute
 	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
 	//glEnableVertexAttribArray(0);
-
+	////Color
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
 
+
+
+	////Position attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
+	//glEnableVertexAttribArray(0);
+	////Color
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	////Texture
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
+
 	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0); //location in Vertexshader, size of vertex attribute(vec3), normalize data, stride(space between data), offset where position data begin
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//Texture
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 }
 
@@ -325,20 +432,16 @@ int main()
 		return -1;
 	}
 
-	InitViewport(0, 0, 800, 600);
-
-	//call this function on every window resize by registering it
-	glfwSetFramebufferSizeCallback(window, OnWindowResized);
-
+	InitSystem();
 
 	// 1. bind Vertex Array Object
-	InitVertexArrayObject(rectangleVAO);
+	InitVertexArrayObject(cubeVAO);
 
 	// 2. copy our vertices array in a buffer for OpenGL to use
-	InitVertexBuffer(sizeof(rectangleVertices), rectangleVertices);
+	InitVertexBuffer(sizeof(cubeVertices), cubeVertices);
 
 	// 3. copy our index array in a element buffer for OpenGL to use
-	InitElementBufferObject();
+	//InitElementBufferObject();
 
 	// 4. then set the vertex attributes pointers
 	InitVertexAttributes();

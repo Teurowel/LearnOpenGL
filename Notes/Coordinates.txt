@@ -1,0 +1,3 @@
+Local coordinate -> World coordinate -> View coordinate -> clip coordinates(homogeneous coordinates) -> normalized device coordinate -> screen coordinate
+	
+world matrix -> view matrix -> projection matrix -> (from here, openGL do) frustum culling(clipping) -> perspective devide(devied by w) -> viewport transform
