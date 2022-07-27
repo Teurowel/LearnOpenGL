@@ -2,6 +2,9 @@
 #define GAME_H
 
 #include <memory>
+#include <unordered_map>
+#include <glm/glm.hpp>
+
 class Camera;
 struct GLFWwindow;
 class ResourceManager;
@@ -29,6 +32,8 @@ public :
 	std::shared_ptr<Camera> GetCamera();
 	GLFWwindow* GetWindow();
 
+
+
 private :
 	GLFWwindow* window;
 
@@ -38,7 +43,7 @@ private :
 
 	bool isWireFrameMode = false;
 
-	std::shared_ptr<Object> object;
+	std::unordered_map<unsigned int, std::shared_ptr<Object>> objectMap;
 
 private :
 	void InitGLFW();
@@ -46,9 +51,20 @@ private :
 	bool InitGLAD();
 	void InitSystem();
 	void InitViewport(int x, int y, int width, int height);
+	void InitResourceManager();
+
+
+	void CreateObject(unsigned int& objectID, unsigned int VBO, bool hasColor, bool hasTexture, const glm::vec3& position);
+
+
 	void ProcessInput(float deltaTime);
-	void EnableWireFrameMode(bool enable);
+	
+
 	void ClearBuffer();
+
+	
+
+	void EnableWireFrameMode(bool enable);
 };
 
 #endif

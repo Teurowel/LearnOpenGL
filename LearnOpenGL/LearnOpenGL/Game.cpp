@@ -36,20 +36,13 @@ bool Game::Init()
 
 	InitSystem();
 
-	resourceManager = std::make_shared<ResourceManager>();
-	resourceManager->Init();
-	
-	resourceManager->CreateShader("DefaultShader", "Shader/shader.vs", "Shader/shader.fs");
-	
-	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
-	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
+	InitResourceManager();
 
 	camera = std::make_shared<Camera>();
 
-
-	object = std::make_shared<Object>();
-	object->Init(resourceManager->GetVBO(ResourceManager::EModel::triangle), false, true);
-	object->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	unsigned int objectID = 0;
+	CreateObject(objectID, resourceManager->GetVBO(ResourceManager::EModel::triangle), false, true, glm::vec3(0.0f, 0.0f, 0.0f));
+	CreateObject(objectID, resourceManager->GetVBO(ResourceManager::EModel::cube), false, true, glm::vec3(5.0f, 0.0f, 0.0f));
 
 	return result;
 }
@@ -58,7 +51,10 @@ void Game::Update(float deltaTime)
 {
 	ProcessInput(deltaTime);
 
-	object->Update();
+	for (auto object : objectMap)
+	{
+		object.second->Update();
+	}
 }
 
 void Game::Render()
@@ -72,12 +68,20 @@ void Game::Render()
 	shader->SetMatrix("view", camera->GetViewMatrix());
 	shader->SetMatrix("projection", camera->GetProjMatrix());
 
-	object->Render(resourceManager, shader);
+	for (auto object : objectMap)
+	{
+		object.second->Render(resourceManager, shader);
+	}
+
+	shader->UnUse();
 }
 
 void Game::Clear()
 {
-	object->Clear();
+	for (auto object : objectMap)
+	{
+		object.second->Clear();
+	}
 
 	resourceManager->Clear();
 
@@ -143,6 +147,17 @@ void Game::InitViewport(int x, int y, int width, int height)
 	glViewport(x, y, width, height); //location of the lower left corner, width and height of the rendering window in pixels
 }
 
+void Game::InitResourceManager()
+{
+	resourceManager = std::make_shared<ResourceManager>();
+	resourceManager->Init();
+
+	resourceManager->CreateShader("DefaultShader", "Shader/shader.vs", "Shader/shader.fs");
+
+	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
+	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
+}
+
 void Game::ProcessInput(float deltaTime)
 {
 	//if it's not pressed, glfwGetKey returns GLFW_RELEASE
@@ -193,4 +208,15 @@ void Game::ClearBuffer()
 {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
+}
+
+void Game::CreateObject(unsigned int& objectID, unsigned int VBO, bool hasColor, bool hasTexture, const glm::vec3& position)
+{
+	std::shared_ptr<Object> object = std::make_shared<Object>();
+	object->Init(objectID, VBO, hasColor, hasTexture);
+	object->SetPosition(position);
+
+	objectMap.insert(std::make_pair(objectID, object));
+
+	++objectID;
 }

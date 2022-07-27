@@ -17,6 +17,8 @@ class Shader
 public :
 	void Init(const char* vertexPath, const char* fragmentPath);
 	void Use(); // use/activate the shader
+	void UnUse();
+	void Clear();
 
 	// utility uniform functions
 	void SetBool(const std::string& name, bool value) const;

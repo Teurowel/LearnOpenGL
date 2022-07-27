@@ -15,14 +15,16 @@ public :
 	Object();
 	~Object();
 
-	void Init(unsigned const int& VBO, bool hasColor, bool hasTexture);
+	void Init(unsigned int objectID, unsigned int VBO, bool hasColor, bool hasTexture);
 	void Update();
 	void Render(std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<Shader> shader);
 	void Clear();
 
-	void SetPosition(glm::vec3 position);
+	void SetPosition(const glm::vec3& position);
 
 private :
+	unsigned int objectID = 0;
+
 	unsigned int VAO = 0;
 
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);

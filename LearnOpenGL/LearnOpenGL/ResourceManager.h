@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <glad/glad.h>
 
 class Shader;
 class Texture;
@@ -30,6 +31,8 @@ private :
 	std::unordered_map<EModel, unsigned int> VBOMap;
 	std::unordered_map<const char*, std::shared_ptr<Shader>> shaderMap;
 	std::unordered_map<const char*, std::shared_ptr<Texture>> textureMap;
+
+	void LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize);
 };
 
 #endif

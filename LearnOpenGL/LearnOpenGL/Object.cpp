@@ -17,8 +17,10 @@ Object::~Object()
 
 }
 
-void Object::Init(unsigned const int& VBO, bool hasColor, bool hasTexture)
+void Object::Init(unsigned int objectID, unsigned int VBO, bool hasColor, bool hasTexture)
 {
+	this->objectID = objectID;
+
 	//stores our vertex attribute configuration and which VBO to use
 	//when you have multiple objects you want to draw, you first generate/configure all the VAOs (and thus the required VBO and attribute pointers)
 	//and store those for later use. The moment we want to draw one of our objects, we take the corresponding VAO, bind it, then draw the object and unbind the VAO again.
@@ -54,9 +56,10 @@ void Object::Render(std::shared_ptr<ResourceManager> resourceManager, std::share
 
 	glBindVertexArray(VAO);
 
-
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(0);
 }
 
 void Object::Clear()
@@ -105,7 +108,7 @@ void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
 	
 }
 
-void Object::SetPosition(glm::vec3 position)
+void Object::SetPosition(const glm::vec3& position)
 {
 	this->position = position;
 }

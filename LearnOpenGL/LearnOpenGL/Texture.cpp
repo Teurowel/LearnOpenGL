@@ -64,3 +64,8 @@ void Texture::Use(unsigned int textureUnit)
 	
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
+
+void Texture::Clear()
+{
+	glDeleteTextures(1, &textureID);
+}
