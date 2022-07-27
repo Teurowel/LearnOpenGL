@@ -1,27 +1,37 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <memory>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+class Shader;
+class ResourceManager;
+
 class Object
 {
 public :
 	Object();
 	~Object();
 
-	void Init(float* vertices);
+	void Init(unsigned const int& VBO, bool hasColor, bool hasTexture);
 	void Update();
-	void Render();
+	void Render(std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<Shader> shader);
 	void Clear();
 
-	void InitVertexAttributes(bool hasColor, bool hasTexture);
+	void SetPosition(glm::vec3 position);
 
 private :
-	float* vertices = nullptr;
-
 	unsigned int VAO = 0;
-	unsigned int VBO = 0;
-	unsigned int EBO = 0;
 
+	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 
+	glm::mat4 worldMatrix;
+
+	void InitVertexAttributes(bool hasColor, bool hasTexture);
 };
 
 #endif

@@ -5,6 +5,9 @@
 #include <iostream>
 
 #include "Camera.h"
+#include "ResourceManager.h"
+#include "Object.h"
+#include "Shader.h"
 
 const float Game::SCREEN_WIDTH = 800.0f;
 const float Game::SCREEN_HEIGHT = 600.0f;
@@ -33,7 +36,20 @@ bool Game::Init()
 
 	InitSystem();
 
+	resourceManager = std::make_shared<ResourceManager>();
+	resourceManager->Init();
+	
+	resourceManager->CreateShader("DefaultShader", "Shader/shader.vs", "Shader/shader.fs");
+	
+	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
+	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
+
 	camera = std::make_shared<Camera>();
+
+
+	object = std::make_shared<Object>();
+	object->Init(resourceManager->GetVBO(ResourceManager::EModel::triangle), false, true);
+	object->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	return result;
 }
@@ -41,15 +57,30 @@ bool Game::Init()
 void Game::Update(float deltaTime)
 {
 	ProcessInput(deltaTime);
+
+	object->Update();
 }
 
 void Game::Render()
 {
 	ClearBuffer();
+
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("DefaultShader");
+	shader->Use();
+	shader->SetInt("texture1", 0);
+	shader->SetInt("texture2", 1);
+	shader->SetMatrix("view", camera->GetViewMatrix());
+	shader->SetMatrix("projection", camera->GetProjMatrix());
+
+	object->Render(resourceManager, shader);
 }
 
 void Game::Clear()
 {
+	object->Clear();
+
+	resourceManager->Clear();
+
 	glfwTerminate();
 }
 

@@ -10,15 +10,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <unordered_map>
 
 class Shader
 {
 public :
-	unsigned int shaderProgramID = 0; //the program ID
-
-	Shader();
-
-	void InitShader(const char* vertexPath, const char* fragmentPath);
+	void Init(const char* vertexPath, const char* fragmentPath);
 	void Use(); // use/activate the shader
 
 	// utility uniform functions
@@ -28,6 +25,8 @@ public :
 	void SetMatrix(const std::string& name, glm::mat4& value) const;
 
 private :
+	unsigned int shaderProgramID = 0; //the program ID
+
 	void ReadShaderFromFile(const char* shaderFilepath, std::string& shaderCode);
 	int CreateAndCompileShader(const char* shaderSource, GLenum shaderType);
 	void CheckShaderCompile(unsigned int shaderID);

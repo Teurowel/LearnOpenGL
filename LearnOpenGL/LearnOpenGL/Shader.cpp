@@ -3,12 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader()
-{
-	shaderProgramID = 0;
-}
-
-void Shader::InitShader(const char* vertexPath, const char* fragmentPath)
+void Shader::Init(const char* vertexPath, const char* fragmentPath)
 {
 	std::string vertexCode = "";
 	ReadShaderFromFile(vertexPath, vertexCode);
@@ -127,11 +122,12 @@ void Shader::CheckShaderProgramLink()
 	int  success;
 	char infoLog[512];
 	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
+
 	if (!success)
 	{
 		glGetProgramInfoLog(shaderProgramID, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADERPROGRAM::LINK_FAILED\n" << infoLog << std::endl;
-	}
+	}	
 }
 
 void Shader::DeleteShader(unsigned int vertexShaderID, unsigned int fragmentShaderID)

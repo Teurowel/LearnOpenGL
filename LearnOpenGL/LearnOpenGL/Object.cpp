@@ -1,6 +1,11 @@
 #include "Object.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "ResourceManager.h"
+#include "Texture.h"
+#include "Shader.h"
 
 Object::Object()
 {
@@ -12,24 +17,51 @@ Object::~Object()
 
 }
 
-void Object::Init(float* vertices)
+void Object::Init(unsigned const int& VBO, bool hasColor, bool hasTexture)
 {
-	this->vertices = vertices;
+	//stores our vertex attribute configuration and which VBO to use
+	//when you have multiple objects you want to draw, you first generate/configure all the VAOs (and thus the required VBO and attribute pointers)
+	//and store those for later use. The moment we want to draw one of our objects, we take the corresponding VAO, bind it, then draw the object and unbind the VAO again.
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	//Bind VBO
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); //bind buffer at GL_ARRAY_BUFFER 
+
+	InitVertexAttributes(hasColor, hasTexture);
+
+
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Object::Update()
 {
-
+	worldMatrix = glm::mat4(1.0f);
+	worldMatrix = glm::translate(worldMatrix, position);
+	worldMatrix = glm::rotate(worldMatrix, 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Object::Render()
+void Object::Render(std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<Shader> shader)
 {
+	std::shared_ptr<Texture> texture = resourceManager->GetTexture("Container");
+	texture->Use(0);
+	texture = resourceManager->GetTexture("Awesomeface");
+	texture->Use(1);
+	
+	shader->SetMatrix("model", worldMatrix);
 
+	glBindVertexArray(VAO);
+
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void Object::Clear()
 {
-
+	glDeleteVertexArrays(1, &VAO);
 }
 
 void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
@@ -72,3 +104,9 @@ void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
 	}
 	
 }
+
+void Object::SetPosition(glm::vec3 position)
+{
+	this->position = position;
+}
+

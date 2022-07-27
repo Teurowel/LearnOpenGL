@@ -4,6 +4,9 @@
 #include <memory>
 class Camera;
 struct GLFWwindow;
+class ResourceManager;
+class Shader;
+class Object;
 
 class Game
 {
@@ -29,9 +32,13 @@ public :
 private :
 	GLFWwindow* window;
 
+	std::shared_ptr<ResourceManager> resourceManager;
+
 	std::shared_ptr<Camera> camera;
 
 	bool isWireFrameMode = false;
+
+	std::shared_ptr<Object> object;
 
 private :
 	void InitGLFW();
