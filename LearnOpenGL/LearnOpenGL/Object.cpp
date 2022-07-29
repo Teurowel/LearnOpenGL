@@ -25,7 +25,7 @@ void Object::Init(unsigned int objectID,
                   std::shared_ptr<ModelData> modelData,
                   std::shared_ptr<Shader> shader,
                   std::shared_ptr<std::list<const char*>> textureKeys,
-                  bool hasColor, bool hasTexture, Game* game)
+                  bool hasColor, bool hasTexture, bool hasNormalVector, Game* game)
 {
 	this->objectID = objectID;
 	this->modelData = modelData;
@@ -42,7 +42,7 @@ void Object::Init(unsigned int objectID,
 	//Bind VBO
 	glBindBuffer(GL_ARRAY_BUFFER, this->modelData->VBO); //bind buffer at GL_ARRAY_BUFFER 
 
-	InitVertexAttributes(hasColor, hasTexture);
+	InitVertexAttributes(hasColor, hasTexture, hasNormalVector);
 
 
 
@@ -66,7 +66,11 @@ void Object::Render()
 	shader->SetMatrix("projection", game->GetCamera()->GetProjMatrix());
 
 	shader->SetVec3("lightColor", game->GetLight()->GetLightColor());
+	shader->SetVec3("lightPos", game->GetLight()->GetLightPos());
 
+	shader->SetVec3("viewPos", game->GetCamera()->GetPosition());
+	
+	
 	if(textureKeys != nullptr)
 	{
 		std::string shaderTextureName = "texture";
@@ -103,7 +107,7 @@ void Object::Clear()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
+void Object::InitVertexAttributes(bool hasColor, bool hasTexture, bool hasNormalVector)
 {
 	int index = 0;
 	int stride = 3;
@@ -116,6 +120,10 @@ void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
 	if (hasTexture)
 	{
 		stride += 2;
+	}
+	if(hasNormalVector)
+	{
+		stride += 3;
 	}
 
 	//Position attribute
@@ -140,6 +148,15 @@ void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
 		glEnableVertexAttribArray(index);
 		++index;
 		offset += 2;
+	}
+
+	if(hasNormalVector)
+	{
+		//Texture
+		glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(offset * sizeof(float)));
+		glEnableVertexAttribArray(index);
+		++index;
+		offset += 3;
 	}
 	
 }

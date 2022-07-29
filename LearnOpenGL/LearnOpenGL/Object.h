@@ -24,7 +24,7 @@ public :
 	          std::shared_ptr<ModelData> modelData,
 	          std::shared_ptr<Shader> shader,
 	          std::shared_ptr<std::list<const char*>> textureKeys,
-	          bool hasColor, bool hasTexture, Game* game);
+	          bool hasColor, bool hasTexture, bool hasNormalVector, Game* game);
 	
 	void Update();
 	void Render();
@@ -56,7 +56,7 @@ private :
 
 	
 	
-	void InitVertexAttributes(bool hasColor, bool hasTexture);
+	void InitVertexAttributes(bool hasColor, bool hasTexture, bool hasNormalVector);
 };
 
 #endif

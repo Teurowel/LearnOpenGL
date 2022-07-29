@@ -99,6 +99,11 @@ void Camera::OnMouseScroll(double scrollYOffset)
 	}
 }
 
+void Camera::SetPosition(const glm::vec3& position)
+{
+	cameraPos = position;
+}
+
 const glm::mat4& Camera::GetViewMatrix()
 {
 	viewMatrix = glm::mat4(1.0f);
@@ -113,4 +118,9 @@ const glm::mat4& Camera::GetProjMatrix()
 	projMatrix = glm::perspective(glm::radians(cameraFov), Game::SCREEN_WIDTH / Game::SCREEN_HEIGHT, 0.1f, 100.0f);
 
 	return projMatrix;
+}
+
+const glm::vec3& Camera::GetPosition()
+{
+	return cameraPos;
 }

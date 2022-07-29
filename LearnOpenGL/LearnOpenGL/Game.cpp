@@ -40,26 +40,12 @@ bool Game::Init()
 	InitResourceManager();
 
 	camera = std::make_shared<Camera>();
+	camera->SetPosition(glm::vec3(1.5f, 2.0f, 8.0f));
+	
 	light = std::make_shared<Light>();
-	light->Init(glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.2f, 1.0f, 2.0f));
+	light->Init(glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.5f, 1.0f, 2.0f));
 	
-	unsigned int objectID = 0;
-	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
-		resourceManager->GetShader("UnLitShader"),
-		nullptr,
-		false, true,
-		light->GetLightPos(),
-		glm::vec3(0.2f, 0.2f, 0.2f));
-	
-	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
-		resourceManager->GetShader("LitShader"),
-		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
-		false, true,
-		glm::vec3(3.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
-
+	InitObjects();
 	
 	
 	return result;
@@ -158,6 +144,50 @@ void Game::InitResourceManager()
 	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
 }
 
+void Game::InitObjects()
+{
+	unsigned int objectID = 0;
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("UnLitShader"),
+		nullptr,
+		false, true, true,
+		light->GetLightPos(),
+		glm::vec3(0.1f, 0.1f, 0.1f));
+	
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("LitShader"),
+		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		false, true, true,
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("LitShader"),
+		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		false, true, true,
+		glm::vec3(3.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("LitShader"),
+		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		false, true, true,
+		glm::vec3(0.0f, 0.0f, 4.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("LitShader"),
+		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		false, true, true,
+		glm::vec3(3.0f, 0.0f, 4.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+}
+
 void Game::ProcessInput(float deltaTime)
 {
 	//if it's not pressed, glfwGetKey returns GLFW_RELEASE
@@ -234,12 +264,12 @@ void Game::CreateObject(unsigned int& objectID,
 	std::shared_ptr<ModelData> modelData,
 	std::shared_ptr<Shader> shader,
 	std::shared_ptr<std::list<const char*>> textureKeys,
-	bool hasColor, bool hasTexture,
+	bool hasColor, bool hasTexture, bool hasNormalVector,
 	const glm::vec3& position,
 	const glm::vec3& scale)
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	object->Init(objectID, modelData, shader, textureKeys, hasColor, hasTexture, this);
+	object->Init(objectID, modelData, shader, textureKeys, hasColor, hasTexture, hasNormalVector, this);
 	object->SetPosition(position);
 	object->SetScale(scale);
 	

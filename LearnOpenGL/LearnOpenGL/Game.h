@@ -62,13 +62,13 @@ private :
 	void InitSystem();
 	void InitViewport(int x, int y, int width, int height);
 	void InitResourceManager();
-
+	void InitObjects();
 
 	void CreateObject(unsigned int& objectID,
 		std::shared_ptr<ModelData> modelData,
 		std::shared_ptr<Shader> shader,
 		std::shared_ptr<std::list<const char*>> textureKeys,
-		bool hasColor, bool hasTexture,
+		bool hasColor, bool hasTexture, bool hasNormalVector,
 		const glm::vec3& position,
 		const glm::vec3& scale);
 
