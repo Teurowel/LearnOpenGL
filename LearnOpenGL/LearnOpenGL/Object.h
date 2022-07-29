@@ -8,6 +8,7 @@
 
 class Shader;
 class ResourceManager;
+struct ModelData;
 
 class Object
 {
@@ -15,7 +16,7 @@ public :
 	Object();
 	~Object();
 
-	void Init(unsigned int objectID, unsigned int VBO, bool hasColor, bool hasTexture);
+	void Init(unsigned int objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture);
 	void Update();
 	void Render(std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<Shader> shader);
 	void Clear();
@@ -26,6 +27,8 @@ private :
 	unsigned int objectID = 0;
 
 	unsigned int VAO = 0;
+
+	std::shared_ptr<ModelData> modelData = nullptr;
 
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);

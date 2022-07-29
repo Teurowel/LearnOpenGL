@@ -5,9 +5,9 @@
 #include <iostream>
 
 #include "Camera.h"
-#include "ResourceManager.h"
 #include "Object.h"
-#include "Shader.h"
+#include "Resources/Shader.h"
+#include "Resources/ResourceManager.h"
 
 const float Game::SCREEN_WIDTH = 800.0f;
 const float Game::SCREEN_HEIGHT = 600.0f;
@@ -41,8 +41,8 @@ bool Game::Init()
 	camera = std::make_shared<Camera>();
 
 	unsigned int objectID = 0;
-	CreateObject(objectID, resourceManager->GetVBO(ResourceManager::EModel::triangle), false, true, glm::vec3(0.0f, 0.0f, 0.0f));
-	CreateObject(objectID, resourceManager->GetVBO(ResourceManager::EModel::cube), false, true, glm::vec3(5.0f, 0.0f, 0.0f));
+	CreateObject(objectID, resourceManager->GetModelData(ResourceManager::EModel::triangle), false, true, glm::vec3(0.0f, 0.0f, 0.0f));
+	CreateObject(objectID, resourceManager->GetModelData(ResourceManager::EModel::cube), false, true, glm::vec3(5.0f, 0.0f, 0.0f));
 
 	return result;
 }
@@ -108,7 +108,7 @@ void Game::InitGLFW()
 
 bool Game::CreateGLFWWindow()
 {
-	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
+	window = glfwCreateWindow((int)SCREEN_WIDTH, (int)SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW widnow" << std::endl;
@@ -132,7 +132,7 @@ bool Game::InitGLAD()
 
 void Game::InitSystem()
 {
-	InitViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	InitViewport(0, 0, (int)SCREEN_WIDTH, (int)SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -210,10 +210,10 @@ void Game::ClearBuffer()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
 }
 
-void Game::CreateObject(unsigned int& objectID, unsigned int VBO, bool hasColor, bool hasTexture, const glm::vec3& position)
+void Game::CreateObject(unsigned int& objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture, const glm::vec3& position)
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	object->Init(objectID, VBO, hasColor, hasTexture);
+	object->Init(objectID, modelData, hasColor, hasTexture);
 	object->SetPosition(position);
 
 	objectMap.insert(std::make_pair(objectID, object));

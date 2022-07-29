@@ -1,11 +1,11 @@
 #include "Object.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
-#include "ResourceManager.h"
-#include "Texture.h"
-#include "Shader.h"
+#include "Resources/ResourceManager.h"
+#include "Resources/Texture.h"
+#include "Resources/Shader.h"
+#include "Resources/ModelData.h"
 
 Object::Object()
 {
@@ -17,10 +17,11 @@ Object::~Object()
 
 }
 
-void Object::Init(unsigned int objectID, unsigned int VBO, bool hasColor, bool hasTexture)
+void Object::Init(unsigned int objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture)
 {
 	this->objectID = objectID;
-
+	this->modelData = modelData;
+	
 	//stores our vertex attribute configuration and which VBO to use
 	//when you have multiple objects you want to draw, you first generate/configure all the VAOs (and thus the required VBO and attribute pointers)
 	//and store those for later use. The moment we want to draw one of our objects, we take the corresponding VAO, bind it, then draw the object and unbind the VAO again.
@@ -28,7 +29,7 @@ void Object::Init(unsigned int objectID, unsigned int VBO, bool hasColor, bool h
 	glBindVertexArray(VAO);
 
 	//Bind VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); //bind buffer at GL_ARRAY_BUFFER 
+	glBindBuffer(GL_ARRAY_BUFFER, this->modelData->VBO); //bind buffer at GL_ARRAY_BUFFER 
 
 	InitVertexAttributes(hasColor, hasTexture);
 
@@ -56,7 +57,7 @@ void Object::Render(std::shared_ptr<ResourceManager> resourceManager, std::share
 
 	glBindVertexArray(VAO);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, modelData->vertexCount);
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glBindVertexArray(0);

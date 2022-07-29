@@ -10,6 +10,7 @@ struct GLFWwindow;
 class ResourceManager;
 class Shader;
 class Object;
+struct ModelData;
 
 class Game
 {
@@ -54,7 +55,7 @@ private :
 	void InitResourceManager();
 
 
-	void CreateObject(unsigned int& objectID, unsigned int VBO, bool hasColor, bool hasTexture, const glm::vec3& position);
+	void CreateObject(unsigned int& objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture, const glm::vec3& position);
 
 
 	void ProcessInput(float deltaTime);

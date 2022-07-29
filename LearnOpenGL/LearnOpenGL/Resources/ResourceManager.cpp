@@ -5,6 +5,7 @@
 
 #include "Shader.h"
 #include "Texture.h"
+#include "ModelData.h"
 
 void ResourceManager::Init()
 {
@@ -58,19 +59,22 @@ void ResourceManager::Init()
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
-	LoadModel(EModel::triangle, triangleVertices, sizeof(triangleVertices));
-	LoadModel(EModel::cube, cubeVertices, sizeof(cubeVertices));
+	LoadModel(EModel::triangle, triangleVertices, sizeof(triangleVertices), 20);
+	LoadModel(EModel::cube, cubeVertices, sizeof(cubeVertices), 20);
 }
 
-void ResourceManager::LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize)
+void ResourceManager::LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize, unsigned int vertexStride)
 {
-	unsigned int VBO = 0;
-	glGenBuffers(1, &VBO); //Generate Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); //bind buffer at GL_ARRAY_BUFFER 
+	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>();
+	
+	glGenBuffers(1, &modelData->VBO); //Generate Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, modelData->VBO); //bind buffer at GL_ARRAY_BUFFER 
 	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW); //set data to GL_ARRAY_BUFFER, stored data in memory on graphics card
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	VBOMap.insert(std::make_pair(modelType, VBO));
+	modelData->vertexCount = verticesSize / vertexStride;
+	
+	modelDataMap.insert(std::make_pair(modelType, modelData));
 }
 
 
@@ -92,9 +96,9 @@ void ResourceManager::CreateTexture(const char* textureKey, const char* textureP
 
 void ResourceManager::Clear()
 {
-	for (auto VBO : VBOMap)
+	for (auto modelData : modelDataMap)
 	{
-		glDeleteBuffers(1, &(VBO.second));
+		glDeleteBuffers(1, &(modelData.second->VBO));
 	}
 
 	for (auto shader : shaderMap)
@@ -108,10 +112,10 @@ void ResourceManager::Clear()
 	}
 }
 
-unsigned int ResourceManager::GetVBO(EModel modelEnum) const
+std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
 {
-	auto foundIter = VBOMap.find(modelEnum);
-	if (foundIter != VBOMap.end())
+	auto foundIter = modelDataMap.find(modelEnum);
+	if (foundIter != modelDataMap.end())
 	{
 		return foundIter->second;
 	}
