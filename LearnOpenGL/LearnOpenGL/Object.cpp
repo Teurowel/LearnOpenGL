@@ -61,14 +61,25 @@ void Object::Update()
 void Object::Render()
 {
 	shader->Use();
+
+	const std::shared_ptr<Camera> camera = game->GetCamera(); 
+	shader->SetMatrix("view", camera->GetViewMatrix());
+	shader->SetMatrix("projection", camera->GetProjMatrix());
+	shader->SetVec3("viewPos", camera->GetPosition());
+
 	
-	shader->SetMatrix("view", game->GetCamera()->GetViewMatrix());
-	shader->SetMatrix("projection", game->GetCamera()->GetProjMatrix());
+	const std::shared_ptr<Light> light = game->GetLight();
+	shader->SetVec3("light.position", light->GetLightPos());
+	shader->SetVec3("light.ambient", light->GetAmbientColor());
+	shader->SetVec3("light.diffuse", light->GetDiffuseColor());
+	shader->SetVec3("light.specular", light->GetSpecularColor());
+	
+	
+	shader->SetVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+	shader->SetVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+	shader->SetVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader->SetFloat("material.shininess", 32.0f);
 
-	shader->SetVec3("lightColor", game->GetLight()->GetLightColor());
-	shader->SetVec3("lightPos", game->GetLight()->GetLightPos());
-
-	shader->SetVec3("viewPos", game->GetCamera()->GetPosition());
 	
 	
 	if(textureKeys != nullptr)

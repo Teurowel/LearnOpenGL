@@ -43,7 +43,10 @@ bool Game::Init()
 	camera->SetPosition(glm::vec3(1.5f, 2.0f, 8.0f));
 	
 	light = std::make_shared<Light>();
-	light->Init(glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.5f, 1.0f, 2.0f));
+	light->Init(glm::vec3(1.5f, 1.0f, 2.0f),
+		glm::vec3(0.2f, 0.2f, 0.2f),
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
 	
 	InitObjects();
 	
