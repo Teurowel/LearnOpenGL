@@ -112,7 +112,7 @@ void ResourceManager::Clear()
 	}
 }
 
-std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
+const std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
 {
 	auto foundIter = modelDataMap.find(modelEnum);
 	if (foundIter != modelDataMap.end())
@@ -128,7 +128,7 @@ std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
 	return 0;
 }
 
-std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) const
+const std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) const
 {
 	auto foundIterator = shaderMap.find(shaderKey);
 	if (foundIterator != shaderMap.end())
@@ -142,7 +142,7 @@ std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) const
 	}
 }
 
-std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
+const std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
 {
 	auto foundIterator = textureMap.find(textureKey);
 	if (foundIterator != textureMap.end())

@@ -15,8 +15,8 @@ public:
 	void OnMouseMove(double mouseXPos, double mouseYPos);
 	void OnMouseScroll(double scrollYOffset);
 
-	glm::mat4& GetViewMatrix();
-	glm::mat4& GetProjMatrix();
+	const glm::mat4& GetViewMatrix();
+	const glm::mat4& GetProjMatrix();
 
 private :
 	const float MAX_CAMERA_FOV;

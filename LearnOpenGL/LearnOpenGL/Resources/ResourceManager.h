@@ -24,9 +24,9 @@ public :
 	void CreateTexture(const char* textureKey, const char* texturePath, unsigned int sourceImageFormat, bool flipVertical);
 	void Clear();
 
-	std::shared_ptr<ModelData> GetModelData(EModel modelEnum) const;
-	std::shared_ptr<Shader> GetShader(const char* shaderKey) const;
-	std::shared_ptr<Texture> GetTexture(const char* textureKey) const;
+	const std::shared_ptr<ModelData> GetModelData(EModel modelEnum) const;
+	const std::shared_ptr<Shader> GetShader(const char* shaderKey) const;
+	const std::shared_ptr<Texture> GetTexture(const char* textureKey) const;
 
 private :
 	std::unordered_map<EModel, std::shared_ptr<ModelData>> modelDataMap;

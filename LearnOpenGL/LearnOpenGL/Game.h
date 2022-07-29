@@ -4,13 +4,18 @@
 #include <memory>
 #include <unordered_map>
 #include <glm/glm.hpp>
+#include <list>
+
+struct GLFWwindow;
+struct ModelData;
 
 class Camera;
-struct GLFWwindow;
 class ResourceManager;
 class Shader;
 class Object;
-struct ModelData;
+class Light;
+
+
 
 class Game
 {
@@ -30,22 +35,26 @@ public :
 	void OnMouseMove(double xpos, double ypos);
 	void OnMouseScroll(double xOffset, double yOffset);
 
-	std::shared_ptr<Camera> GetCamera();
+	const std::shared_ptr<ResourceManager> GetResourceManager();
+	const std::shared_ptr<Camera> GetCamera();
+	const std::shared_ptr<Light> GetLight();
+	
 	GLFWwindow* GetWindow();
-
-
 
 private :
 	GLFWwindow* window;
 
 	std::shared_ptr<ResourceManager> resourceManager;
-
 	std::shared_ptr<Camera> camera;
-
-	bool isWireFrameMode = false;
+	std::shared_ptr<Light> light;
+	
 
 	std::unordered_map<unsigned int, std::shared_ptr<Object>> objectMap;
 
+
+
+
+	bool isWireFrameMode = false;
 private :
 	void InitGLFW();
 	bool CreateGLFWWindow();
@@ -55,7 +64,13 @@ private :
 	void InitResourceManager();
 
 
-	void CreateObject(unsigned int& objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture, const glm::vec3& position);
+	void CreateObject(unsigned int& objectID,
+		std::shared_ptr<ModelData> modelData,
+		std::shared_ptr<Shader> shader,
+		std::shared_ptr<std::list<const char*>> textureKeys,
+		bool hasColor, bool hasTexture,
+		const glm::vec3& position,
+		const glm::vec3& scale);
 
 
 	void ProcessInput(float deltaTime);

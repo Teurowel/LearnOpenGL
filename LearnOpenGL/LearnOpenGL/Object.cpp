@@ -1,11 +1,15 @@
 #include "Object.h"
 
 #include <glad/glad.h>
+#include <string>
 
 #include "Resources/ResourceManager.h"
 #include "Resources/Texture.h"
 #include "Resources/Shader.h"
 #include "Resources/ModelData.h"
+#include "Camera.h"
+#include "Game.h"
+#include "Light.h"
 
 Object::Object()
 {
@@ -17,10 +21,17 @@ Object::~Object()
 
 }
 
-void Object::Init(unsigned int objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture)
+void Object::Init(unsigned int objectID,
+                  std::shared_ptr<ModelData> modelData,
+                  std::shared_ptr<Shader> shader,
+                  std::shared_ptr<std::list<const char*>> textureKeys,
+                  bool hasColor, bool hasTexture, Game* game)
 {
 	this->objectID = objectID;
 	this->modelData = modelData;
+	this->shader = shader;
+	this->textureKeys = textureKeys;
+	this->game = game;
 	
 	//stores our vertex attribute configuration and which VBO to use
 	//when you have multiple objects you want to draw, you first generate/configure all the VAOs (and thus the required VBO and attribute pointers)
@@ -44,14 +55,36 @@ void Object::Update()
 	worldMatrix = glm::mat4(1.0f);
 	worldMatrix = glm::translate(worldMatrix, position);
 	worldMatrix = glm::rotate(worldMatrix, 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	worldMatrix = glm::scale(worldMatrix, scale);
 }
 
-void Object::Render(std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<Shader> shader)
+void Object::Render()
 {
-	std::shared_ptr<Texture> texture = resourceManager->GetTexture("Container");
-	texture->Use(0);
-	texture = resourceManager->GetTexture("Awesomeface");
-	texture->Use(1);
+	shader->Use();
+	
+	shader->SetMatrix("view", game->GetCamera()->GetViewMatrix());
+	shader->SetMatrix("projection", game->GetCamera()->GetProjMatrix());
+
+	shader->SetVec3("lightColor", game->GetLight()->GetLightColor());
+
+	if(textureKeys != nullptr)
+	{
+		std::string shaderTextureName = "texture";
+		std::string shaderTextureNum = "0";
+
+		int num = 0;
+		for(auto textureKey : (*textureKeys))
+		{
+			shaderTextureName = "texture";
+			shaderTextureNum = std::to_string(num);
+			shader->SetInt(shaderTextureName + shaderTextureNum, num);
+
+			game->GetResourceManager()->GetTexture(textureKey)->Use(num);
+
+			++num;
+		}	
+	}
+	
 	
 	shader->SetMatrix("model", worldMatrix);
 
@@ -61,10 +94,12 @@ void Object::Render(std::shared_ptr<ResourceManager> resourceManager, std::share
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glBindVertexArray(0);
+
+	shader->UnUse();
 }
 
 void Object::Clear()
-{
+{	
 	glDeleteVertexArrays(1, &VAO);
 }
 
@@ -112,5 +147,15 @@ void Object::InitVertexAttributes(bool hasColor, bool hasTexture)
 void Object::SetPosition(const glm::vec3& position)
 {
 	this->position = position;
+}
+
+void Object::SetScale(const glm::vec3& scale)
+{
+	this->scale = scale;
+}
+
+std::shared_ptr<Shader> Object::GetShader() const
+{
+	return shader;
 }
 

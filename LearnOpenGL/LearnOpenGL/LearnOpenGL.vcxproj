@@ -145,6 +145,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Resources\ResourceManager.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -439,6 +440,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Resources\ModelData.h" />
     <ClInclude Include="Resources\ResourceManager.h" />
@@ -447,8 +449,14 @@
     <ClInclude Include="Resources\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\shader.fs" />
-    <None Include="Shader\shader.vs" />
+    <None Include="Shader\LitFragmentShader.fs" />
+    <None Include="Shader\LitVertexShader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Shader\UnLitFragmentShader.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Shader\UnLitVertexShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

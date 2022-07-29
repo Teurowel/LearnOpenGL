@@ -1,4 +1,8 @@
 #include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
 #include "Game.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -95,7 +99,7 @@ void Camera::OnMouseScroll(double scrollYOffset)
 	}
 }
 
-glm::mat4& Camera::GetViewMatrix()
+const glm::mat4& Camera::GetViewMatrix()
 {
 	viewMatrix = glm::mat4(1.0f);
 	viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -103,7 +107,7 @@ glm::mat4& Camera::GetViewMatrix()
 	return viewMatrix;
 }
 
-glm::mat4& Camera::GetProjMatrix()
+const glm::mat4& Camera::GetProjMatrix()
 {
 	projMatrix = glm::mat4(1.0f);
 	projMatrix = glm::perspective(glm::radians(cameraFov), Game::SCREEN_WIDTH / Game::SCREEN_HEIGHT, 0.1f, 100.0f);

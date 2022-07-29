@@ -8,6 +8,7 @@
 #include "Object.h"
 #include "Resources/Shader.h"
 #include "Resources/ResourceManager.h"
+#include "Light.h"
 
 const float Game::SCREEN_WIDTH = 800.0f;
 const float Game::SCREEN_HEIGHT = 600.0f;
@@ -39,11 +40,28 @@ bool Game::Init()
 	InitResourceManager();
 
 	camera = std::make_shared<Camera>();
-
+	light = std::make_shared<Light>();
+	light->Init(glm::vec3(1.0f, 1.0f, 1.0f),glm::vec3(1.2f, 1.0f, 2.0f));
+	
 	unsigned int objectID = 0;
-	CreateObject(objectID, resourceManager->GetModelData(ResourceManager::EModel::triangle), false, true, glm::vec3(0.0f, 0.0f, 0.0f));
-	CreateObject(objectID, resourceManager->GetModelData(ResourceManager::EModel::cube), false, true, glm::vec3(5.0f, 0.0f, 0.0f));
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("UnLitShader"),
+		nullptr,
+		false, true,
+		light->GetLightPos(),
+		glm::vec3(0.2f, 0.2f, 0.2f));
+	
+	CreateObject(objectID,
+		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetShader("LitShader"),
+		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		false, true,
+		glm::vec3(3.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
 
+	
+	
 	return result;
 }
 
@@ -61,19 +79,10 @@ void Game::Render()
 {
 	ClearBuffer();
 
-	std::shared_ptr<Shader> shader = resourceManager->GetShader("DefaultShader");
-	shader->Use();
-	shader->SetInt("texture1", 0);
-	shader->SetInt("texture2", 1);
-	shader->SetMatrix("view", camera->GetViewMatrix());
-	shader->SetMatrix("projection", camera->GetProjMatrix());
-
 	for (auto object : objectMap)
-	{
-		object.second->Render(resourceManager, shader);
+	{		
+		object.second->Render();
 	}
-
-	shader->UnUse();
 }
 
 void Game::Clear()
@@ -86,16 +95,6 @@ void Game::Clear()
 	resourceManager->Clear();
 
 	glfwTerminate();
-}
-
-std::shared_ptr<Camera> Game::GetCamera()
-{
-	return camera;
-}
-
-GLFWwindow* Game::GetWindow()
-{
-	return window;
 }
 
 void Game::InitGLFW()
@@ -152,7 +151,8 @@ void Game::InitResourceManager()
 	resourceManager = std::make_shared<ResourceManager>();
 	resourceManager->Init();
 
-	resourceManager->CreateShader("DefaultShader", "Shader/shader.vs", "Shader/shader.fs");
+	resourceManager->CreateShader("UnLitShader", "Shader/UnLitVertexShader.vs", "Shader/UnLitFragmentShader.fs");
+	resourceManager->CreateShader("LitShader", "Shader/LitVertexShader.vs", "Shader/LitFragmentShader.fs");
 
 	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
 	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
@@ -192,6 +192,26 @@ void Game::OnMouseScroll(double xOffset, double yOffset)
 	camera->OnMouseScroll(yOffset);
 }
 
+const std::shared_ptr<ResourceManager> Game::GetResourceManager()
+{
+	return resourceManager;
+}
+
+const std::shared_ptr<Camera> Game::GetCamera()
+{
+	return camera;
+}
+
+const std::shared_ptr<Light> Game::GetLight()
+{
+	return light;
+}
+
+GLFWwindow* Game::GetWindow()
+{
+	return window;
+}
+
 void Game::EnableWireFrameMode(bool enable)
 {
 	if (enable == true)
@@ -210,12 +230,19 @@ void Game::ClearBuffer()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
 }
 
-void Game::CreateObject(unsigned int& objectID, std::shared_ptr<ModelData> modelData, bool hasColor, bool hasTexture, const glm::vec3& position)
+void Game::CreateObject(unsigned int& objectID,
+	std::shared_ptr<ModelData> modelData,
+	std::shared_ptr<Shader> shader,
+	std::shared_ptr<std::list<const char*>> textureKeys,
+	bool hasColor, bool hasTexture,
+	const glm::vec3& position,
+	const glm::vec3& scale)
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	object->Init(objectID, modelData, hasColor, hasTexture);
+	object->Init(objectID, modelData, shader, textureKeys, hasColor, hasTexture, this);
 	object->SetPosition(position);
-
+	object->SetScale(scale);
+	
 	objectMap.insert(std::make_pair(objectID, object));
 
 	++objectID;
