@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Game.h"
 #include "Light.h"
+#include "Resources/Material.h"
 
 Object::Object()
 {
@@ -24,13 +25,13 @@ Object::~Object()
 void Object::Init(unsigned int objectID,
                   std::shared_ptr<ModelData> modelData,
                   std::shared_ptr<Shader> shader,
-                  std::shared_ptr<std::list<const char*>> textureKeys,
+                  std::shared_ptr<Material> material,
                   bool hasColor, bool hasTexture, bool hasNormalVector, Game* game)
 {
 	this->objectID = objectID;
 	this->modelData = modelData;
 	this->shader = shader;
-	this->textureKeys = textureKeys;
+	this->material = material;
 	this->game = game;
 	
 	//stores our vertex attribute configuration and which VBO to use
@@ -74,32 +75,17 @@ void Object::Render()
 	shader->SetVec3("light.diffuse", light->GetDiffuseColor());
 	shader->SetVec3("light.specular", light->GetSpecularColor());
 	
-	
-	shader->SetVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-	shader->SetVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-	shader->SetVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader->SetFloat("material.shininess", 32.0f);
-
-	
-	
-	if(textureKeys != nullptr)
+	if(material != nullptr)
 	{
-		std::string shaderTextureName = "texture";
-		std::string shaderTextureNum = "0";
+		const std::shared_ptr<ResourceManager> resourceManager = game->GetResourceManager(); 
+		shader->SetInt("material.diffuse", 0);
+		resourceManager->GetTexture(material->GetDiffuseTextureKey())->Use(0);
 
-		int num = 0;
-		for(auto textureKey : (*textureKeys))
-		{
-			shaderTextureName = "texture";
-			shaderTextureNum = std::to_string(num);
-			shader->SetInt(shaderTextureName + shaderTextureNum, num);
-
-			game->GetResourceManager()->GetTexture(textureKey)->Use(num);
-
-			++num;
-		}	
+		shader->SetInt("material.specular", 1);
+		resourceManager->GetTexture(material->GetSpecularTextureKey())->Use(1);
+		
+		shader->SetFloat("material.shininess", material->GetShininess());
 	}
-	
 	
 	shader->SetMatrix("model", worldMatrix);
 

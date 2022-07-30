@@ -140,11 +140,18 @@ void Game::InitResourceManager()
 	resourceManager = std::make_shared<ResourceManager>();
 	resourceManager->Init();
 
+	
 	resourceManager->CreateShader("UnLitShader", "Shader/UnLitVertexShader.vs", "Shader/UnLitFragmentShader.fs");
 	resourceManager->CreateShader("LitShader", "Shader/LitVertexShader.vs", "Shader/LitFragmentShader.fs");
 
+	
 	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
 	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
+	resourceManager->CreateTexture("Container2", "Texture/container2.png", GL_RGBA, true);
+	resourceManager->CreateTexture("Container2_Specular", "Texture/container2_specular.png", GL_RGBA, true);
+
+	
+	resourceManager->CreateMaterial("Container2", "Container2", "Container2_Specular", 32.0f);
 }
 
 void Game::InitObjects()
@@ -161,7 +168,7 @@ void Game::InitObjects()
 	CreateObject(objectID,
 		resourceManager->GetModelData(ResourceManager::EModel::cube),
 		resourceManager->GetShader("LitShader"),
-		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		resourceManager->GetMaterial("Container2"),
 		false, true, true,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
@@ -169,7 +176,7 @@ void Game::InitObjects()
 	CreateObject(objectID,
 		resourceManager->GetModelData(ResourceManager::EModel::cube),
 		resourceManager->GetShader("LitShader"),
-		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		resourceManager->GetMaterial("Container2"),
 		false, true, true,
 		glm::vec3(3.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
@@ -177,7 +184,7 @@ void Game::InitObjects()
 	CreateObject(objectID,
 		resourceManager->GetModelData(ResourceManager::EModel::cube),
 		resourceManager->GetShader("LitShader"),
-		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		resourceManager->GetMaterial("Container2"),
 		false, true, true,
 		glm::vec3(0.0f, 0.0f, 4.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
@@ -185,7 +192,7 @@ void Game::InitObjects()
 	CreateObject(objectID,
 		resourceManager->GetModelData(ResourceManager::EModel::cube),
 		resourceManager->GetShader("LitShader"),
-		std::make_shared<std::list<const char*>>(std::list<const char*>({"Container", "Awesomeface"})),
+		resourceManager->GetMaterial("Container2"),
 		false, true, true,
 		glm::vec3(3.0f, 0.0f, 4.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
@@ -266,13 +273,13 @@ void Game::ClearBuffer()
 void Game::CreateObject(unsigned int& objectID,
 	std::shared_ptr<ModelData> modelData,
 	std::shared_ptr<Shader> shader,
-	std::shared_ptr<std::list<const char*>> textureKeys,
+	std::shared_ptr<Material> material,
 	bool hasColor, bool hasTexture, bool hasNormalVector,
 	const glm::vec3& position,
 	const glm::vec3& scale)
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	object->Init(objectID, modelData, shader, textureKeys, hasColor, hasTexture, hasNormalVector, this);
+	object->Init(objectID, modelData, shader, material, hasColor, hasTexture, hasNormalVector, this);
 	object->SetPosition(position);
 	object->SetScale(scale);
 	

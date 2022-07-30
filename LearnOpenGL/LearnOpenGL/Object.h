@@ -6,13 +6,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <list>
 
-
 struct ModelData;
 
 class Shader;
 class ResourceManager;
 class Camera;
 class Game;
+class Material;
 
 class Object
 {
@@ -23,7 +23,7 @@ public :
 	void Init(unsigned int objectID,
 	          std::shared_ptr<ModelData> modelData,
 	          std::shared_ptr<Shader> shader,
-	          std::shared_ptr<std::list<const char*>> textureKeys,
+	          std::shared_ptr<Material> material,
 	          bool hasColor, bool hasTexture, bool hasNormalVector, Game* game);
 	
 	void Update();
@@ -42,7 +42,7 @@ private :
 
 	std::shared_ptr<ModelData> modelData = nullptr;
 	std::shared_ptr<Shader> shader = nullptr;
-	std::shared_ptr<std::list<const char*>> textureKeys = nullptr;
+	std::shared_ptr<Material> material = nullptr;
 
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);

@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "ModelData.h"
+#include "Material.h"
 
 void ResourceManager::Init()
 {
@@ -94,6 +95,15 @@ void ResourceManager::CreateTexture(const char* textureKey, const char* textureP
 	textureMap.insert(std::make_pair(textureKey, texture));
 }
 
+void ResourceManager::CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey,
+                                     float shininess)
+{
+	std::shared_ptr<Material> material = std::make_shared<Material>();
+	material->Init(diffuseTextureKey, specularTextureKey, shininess);
+
+	materialMap.insert(std::make_pair(materialKey, material));
+}
+
 void ResourceManager::Clear()
 {
 	for (auto modelData : modelDataMap)
@@ -110,6 +120,11 @@ void ResourceManager::Clear()
 	{
 		texture.second->Clear();
 	}
+
+	for(auto material : materialMap)
+	{
+		material.second->Clear();
+	}
 }
 
 const std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
@@ -121,7 +136,7 @@ const std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum)
 	}
 	else
 	{
-		std::cout << "ResourceManager::GetVBO Error, not found modelEnum : " << modelEnum << std::endl;
+		std::cout << "ResourceManager::GetModelData Error, not found modelEnum : " << modelEnum << std::endl;
 		return 0;
 	}
 	
@@ -130,28 +145,30 @@ const std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum)
 
 const std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) const
 {
-	auto foundIterator = shaderMap.find(shaderKey);
-	if (foundIterator != shaderMap.end())
-	{
-		return foundIterator->second;
-	}
-	else
-	{
-		std::cout << "Shader::FindShaderProgramID Error, not found shaderKey : " << shaderKey << std::endl;
-		return nullptr;
-	}
+	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Shader>>, std::shared_ptr<Shader>>(shaderMap, shaderKey);
 }
 
 const std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
 {
-	auto foundIterator = textureMap.find(textureKey);
-	if (foundIterator != textureMap.end())
+	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Texture>>, std::shared_ptr<Texture>>(textureMap, textureKey);
+}
+
+const std::shared_ptr<Material> ResourceManager::GetMaterial(const char* materialKey) const
+{
+	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Material>>, std::shared_ptr<Material>>(materialMap, materialKey);
+}
+
+template <class MAP_TYPE, class ELEMENT_TYPE>
+const ELEMENT_TYPE ResourceManager::FindMapElement(MAP_TYPE map, const char* key) const
+{
+	auto foundIterator = map.find(key);
+	if (foundIterator != map.end())
 	{
 		return foundIterator->second;
 	}
 	else
 	{
-		std::cout << "Shader::FindShaderProgramID Error, not found shaderKey : " << textureKey << std::endl;
+		std::cout << "ResourceManager::FindMapElement Error, not found Key : " << key << std::endl;
 		return nullptr;
 	}
 }

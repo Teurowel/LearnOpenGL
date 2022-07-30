@@ -14,7 +14,7 @@ class ResourceManager;
 class Shader;
 class Object;
 class Light;
-
+class Material;
 
 
 class Game
@@ -67,7 +67,7 @@ private :
 	void CreateObject(unsigned int& objectID,
 		std::shared_ptr<ModelData> modelData,
 		std::shared_ptr<Shader> shader,
-		std::shared_ptr<std::list<const char*>> textureKeys,
+		std::shared_ptr<Material> material,
 		bool hasColor, bool hasTexture, bool hasNormalVector,
 		const glm::vec3& position,
 		const glm::vec3& scale);
