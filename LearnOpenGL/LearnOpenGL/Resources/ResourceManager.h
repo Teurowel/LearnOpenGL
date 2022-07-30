@@ -26,7 +26,7 @@ public :
 
 	void Init();
 	void CreateShader(const char* shaderKey, const char* vertexPath, const char* fragmentPath);
-	void CreateTexture(const char* textureKey, const char* texturePath, unsigned int sourceImageFormat, bool flipVertical);
+	void CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical);
 	void CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey, float shininess);
 	void Clear();
 

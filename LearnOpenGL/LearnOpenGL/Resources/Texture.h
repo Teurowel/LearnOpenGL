@@ -6,7 +6,7 @@
 class Texture
 {
 public :
-	void Init(const char* texturePath, GLenum sourceImageFormat, bool flipVertical);
+	void Init(const char* texturePath, bool flipVertical);
 	void Use(unsigned int textureUnit);
 	void Clear();
 

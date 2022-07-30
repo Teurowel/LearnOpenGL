@@ -43,10 +43,12 @@ bool Game::Init()
 	camera->SetPosition(glm::vec3(1.5f, 2.0f, 8.0f));
 	
 	light = std::make_shared<Light>();
-	light->Init(glm::vec3(1.5f, 1.0f, 2.0f),
-		glm::vec3(0.2f, 0.2f, 0.2f),
-		glm::vec3(0.5f, 0.5f, 0.5f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
+	light->Init(glm::vec3(4.0f, 2.0f, 2.0f),
+	            glm::vec3(-0.2f, -1.0f, -0.3f),
+	            glm::vec3(0.2f, 0.2f, 0.2f),
+	            glm::vec3(0.5f, 0.5f, 0.5f),
+	            glm::vec3(1.0f, 1.0f, 1.0f),
+	            1.0f, 0.09f, 0.032f);
 	
 	InitObjects();
 	
@@ -145,10 +147,10 @@ void Game::InitResourceManager()
 	resourceManager->CreateShader("LitShader", "Shader/LitVertexShader.vs", "Shader/LitFragmentShader.fs");
 
 	
-	resourceManager->CreateTexture("Container", "Texture/container.jpg", GL_RGB, false);
-	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", GL_RGBA, true);
-	resourceManager->CreateTexture("Container2", "Texture/container2.png", GL_RGBA, true);
-	resourceManager->CreateTexture("Container2_Specular", "Texture/container2_specular.png", GL_RGBA, true);
+	resourceManager->CreateTexture("Container", "Texture/container.jpg", false);
+	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", true);
+	resourceManager->CreateTexture("Container2", "Texture/container2.png", true);
+	resourceManager->CreateTexture("Container2_Specular", "Texture/container2_specular.png", true);
 
 	
 	resourceManager->CreateMaterial("Container2", "Container2", "Container2_Specular", 32.0f);
@@ -157,13 +159,14 @@ void Game::InitResourceManager()
 void Game::InitObjects()
 {
 	unsigned int objectID = 0;
+
 	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
-		resourceManager->GetShader("UnLitShader"),
-		nullptr,
-		false, true, true,
-		light->GetLightPos(),
-		glm::vec3(0.1f, 0.1f, 0.1f));
+			resourceManager->GetModelData(ResourceManager::EModel::cube),
+			resourceManager->GetShader("UnLitShader"),
+			nullptr,
+			false, true, true,
+			light->GetLightPosition(),
+			glm::vec3(0.1f, 0.1f, 0.1f));
 	
 	CreateObject(objectID,
 		resourceManager->GetModelData(ResourceManager::EModel::cube),

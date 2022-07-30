@@ -20,6 +20,7 @@ public:
 	const glm::mat4& GetViewMatrix();
 	const glm::mat4& GetProjMatrix();
 	const glm::vec3& GetPosition();
+	const glm::vec3& GetCameraFront();
 
 private :
 	const float MAX_CAMERA_FOV;

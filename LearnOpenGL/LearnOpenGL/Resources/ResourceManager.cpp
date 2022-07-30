@@ -87,10 +87,10 @@ void ResourceManager::CreateShader(const char* shaderKey, const char* vertexPath
 	shaderMap.insert(std::make_pair(shaderKey, shader));
 }
 
-void ResourceManager::CreateTexture(const char* textureKey, const char* texturePath, unsigned int sourceImageFormat, bool flipVertical)
+void ResourceManager::CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical)
 {
 	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-	texture->Init(texturePath, sourceImageFormat, flipVertical);
+	texture->Init(texturePath, flipVertical);
 
 	textureMap.insert(std::make_pair(textureKey, texture));
 }

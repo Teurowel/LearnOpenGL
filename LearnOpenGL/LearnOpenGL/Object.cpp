@@ -70,10 +70,20 @@ void Object::Render()
 
 	
 	const std::shared_ptr<Light> light = game->GetLight();
-	shader->SetVec3("light.position", light->GetLightPos());
+	//shader->SetVec3("light.position", light->GetLightPosition());
+	//shader->SetVec3("light.direction", light->GetLightDirection());
+	shader->SetVec3("light.position", camera->GetPosition());
+	shader->SetVec3("light.direction", camera->GetCameraFront());
+	shader->SetFloat("light.innerCutOff", glm::cos(glm::radians(12.5f)));
+	shader->SetFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+
 	shader->SetVec3("light.ambient", light->GetAmbientColor());
 	shader->SetVec3("light.diffuse", light->GetDiffuseColor());
 	shader->SetVec3("light.specular", light->GetSpecularColor());
+	
+	shader->SetFloat("light.constant", light->GetCosntant());
+	shader->SetFloat("light.linear", light->GetLinear());
+	shader->SetFloat("light.quadratic", light->GetQuadratic());
 	
 	if(material != nullptr)
 	{
