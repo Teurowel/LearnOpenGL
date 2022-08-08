@@ -22,16 +22,16 @@ public :
 
 	void Init(unsigned int objectID,
 	          std::shared_ptr<ModelData> modelData,
-	          std::shared_ptr<Shader> shader,
 	          std::shared_ptr<Material> material,
 	          bool hasColor, bool hasTexture, bool hasNormalVector, Game* game);
 	
 	void Update();
-	void Render();
+	void Render(std::shared_ptr<Shader> shader);
 	void Clear();
 	
 	void SetPosition(const glm::vec3& position);
 	void SetScale(const glm::vec3& scale);
+	void SetUnLitColor(const glm::vec3& color);
 	
 	std::shared_ptr<Shader> GetShader() const;
 	
@@ -41,7 +41,6 @@ private :
 	unsigned int VAO = 0;
 
 	std::shared_ptr<ModelData> modelData = nullptr;
-	std::shared_ptr<Shader> shader = nullptr;
 	std::shared_ptr<Material> material = nullptr;
 
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -50,6 +49,7 @@ private :
 
 	glm::mat4 worldMatrix;
 
+	glm::vec3 unLitColor = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
 	Game* game;

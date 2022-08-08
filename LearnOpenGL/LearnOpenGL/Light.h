@@ -3,6 +3,11 @@
 
 #include <glm/glm.hpp>
 
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+
 class Light
 {
 public:
@@ -13,8 +18,8 @@ public:
               const glm::vec3& specularColor,
               float constant, float linear, float quadratic);
 
-    const glm::vec3& GetLightPosition() const;
-    const glm::vec3& GetLightDirection() const;
+    const glm::vec3& GetPosition() const;
+    const glm::vec3& GetDirection() const;
     
     const glm::vec3& GetAmbientColor() const;
     const glm::vec3& GetDiffuseColor() const;

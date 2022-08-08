@@ -22,7 +22,7 @@ class Game
 public :
 	const static float SCREEN_WIDTH;
 	const static float SCREEN_HEIGHT;
-
+	const static int NR_POINT_LIGHTS;
 public :
 	Game();
 
@@ -46,11 +46,13 @@ private :
 
 	std::shared_ptr<ResourceManager> resourceManager;
 	std::shared_ptr<Camera> camera;
-	std::shared_ptr<Light> light;
 	
+	std::shared_ptr<Light> directionalLight;
+	std::vector<std::shared_ptr<Light>> pointLightVec;
+	std::shared_ptr<Light> spotLight;
 
 	std::unordered_map<unsigned int, std::shared_ptr<Object>> objectMap;
-
+	std::unordered_map<const char*, std::shared_ptr<std::list<std::shared_ptr<Object>>>> shaderObjectMap;
 
 
 
@@ -62,23 +64,23 @@ private :
 	void InitSystem();
 	void InitViewport(int x, int y, int width, int height);
 	void InitResourceManager();
+	void InitLights();
 	void InitObjects();
 
-	void CreateObject(unsigned int& objectID,
+	std::shared_ptr<Object> CreateObject(unsigned int& objectID,
 		std::shared_ptr<ModelData> modelData,
-		std::shared_ptr<Shader> shader,
+		const char* shaderKey,
 		std::shared_ptr<Material> material,
 		bool hasColor, bool hasTexture, bool hasNormalVector,
 		const glm::vec3& position,
 		const glm::vec3& scale);
-
+	void AddToShaderObjectMap(const char* shaderKey, std::shared_ptr<Object> object);
+	
 
 	void ProcessInput(float deltaTime);
 	
 
 	void ClearBuffer();
-
-	
 
 	void EnableWireFrameMode(bool enable);
 };

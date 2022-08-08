@@ -24,13 +24,11 @@ Object::~Object()
 
 void Object::Init(unsigned int objectID,
                   std::shared_ptr<ModelData> modelData,
-                  std::shared_ptr<Shader> shader,
                   std::shared_ptr<Material> material,
                   bool hasColor, bool hasTexture, bool hasNormalVector, Game* game)
 {
 	this->objectID = objectID;
 	this->modelData = modelData;
-	this->shader = shader;
 	this->material = material;
 	this->game = game;
 	
@@ -59,31 +57,9 @@ void Object::Update()
 	worldMatrix = glm::scale(worldMatrix, scale);
 }
 
-void Object::Render()
+void Object::Render(std::shared_ptr<Shader> shader)
 {
-	shader->Use();
-
-	const std::shared_ptr<Camera> camera = game->GetCamera(); 
-	shader->SetMatrix("view", camera->GetViewMatrix());
-	shader->SetMatrix("projection", camera->GetProjMatrix());
-	shader->SetVec3("viewPos", camera->GetPosition());
-
-	
-	const std::shared_ptr<Light> light = game->GetLight();
-	//shader->SetVec3("light.position", light->GetLightPosition());
-	//shader->SetVec3("light.direction", light->GetLightDirection());
-	shader->SetVec3("light.position", camera->GetPosition());
-	shader->SetVec3("light.direction", camera->GetCameraFront());
-	shader->SetFloat("light.innerCutOff", glm::cos(glm::radians(12.5f)));
-	shader->SetFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-
-	shader->SetVec3("light.ambient", light->GetAmbientColor());
-	shader->SetVec3("light.diffuse", light->GetDiffuseColor());
-	shader->SetVec3("light.specular", light->GetSpecularColor());
-	
-	shader->SetFloat("light.constant", light->GetCosntant());
-	shader->SetFloat("light.linear", light->GetLinear());
-	shader->SetFloat("light.quadratic", light->GetQuadratic());
+	shader->SetVec3("unLitColor", unLitColor);
 	
 	if(material != nullptr)
 	{
@@ -105,8 +81,6 @@ void Object::Render()
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glBindVertexArray(0);
-
-	shader->UnUse();
 }
 
 void Object::Clear()
@@ -178,8 +152,8 @@ void Object::SetScale(const glm::vec3& scale)
 	this->scale = scale;
 }
 
-std::shared_ptr<Shader> Object::GetShader() const
+void Object::SetUnLitColor(const glm::vec3& color)
 {
-	return shader;
+	this->unLitColor = color;
 }
 

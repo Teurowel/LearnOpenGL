@@ -19,12 +19,12 @@ void Light::Init(const glm::vec3& lightPosition,
     this->quadratic = quadratic;
 }
 
-const glm::vec3& Light::GetLightPosition() const
+const glm::vec3& Light::GetPosition() const
 {
     return lightPosition;
 }
 
-const glm::vec3& Light::GetLightDirection() const
+const glm::vec3& Light::GetDirection() const
 {
     return lightDirection;
 }
