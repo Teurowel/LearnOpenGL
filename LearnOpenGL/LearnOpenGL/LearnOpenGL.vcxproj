@@ -146,6 +146,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Resources\Material.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -513,6 +514,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Resources\Material.h" />
     <ClInclude Include="Resources\ModelData.h" />
