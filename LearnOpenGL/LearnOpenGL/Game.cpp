@@ -9,6 +9,7 @@
 #include "Resources/Shader.h"
 #include "Resources/ResourceManager.h"
 #include "Light.h"
+#include "Model.h"
 
 const float Game::SCREEN_WIDTH = 800.0f;
 const float Game::SCREEN_HEIGHT = 600.0f;
@@ -48,8 +49,9 @@ bool Game::Init()
 	
 	
 	
-	InitObjects();
+	//InitObjects();
 	
+	model = std::make_shared<Model>("Asset/Objects/Backpack/backpack.obj");
 	
 	return result;
 }
@@ -68,68 +70,105 @@ void Game::Render()
 {
 	ClearBuffer();
 
-	std::shared_ptr<Shader> shader = nullptr;
-	for(auto shaderObjectElement : shaderObjectMap)
-	{
-		shader = resourceManager->GetShader(shaderObjectElement.first);
+	//std::shared_ptr<Shader> shader = nullptr;
+	//for(auto shaderObjectElement : shaderObjectMap)
+	//{
+	//	shader = resourceManager->GetShader(shaderObjectElement.first);
 
-		shader->Use();
+	//	shader->Use();
 
-		//camera set
-		shader->SetMatrix("view", camera->GetViewMatrix());
-		shader->SetMatrix("projection", camera->GetProjMatrix());
-		shader->SetVec3("viewPos", camera->GetPosition());
+	//	//camera set
+	//	shader->SetMatrix("view", camera->GetViewMatrix());
+	//	shader->SetMatrix("projection", camera->GetProjMatrix());
+	//	shader->SetVec3("viewPos", camera->GetPosition());
 
-		//directional light set
-		shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
-		shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
-		shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
-		shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
+	//	//directional light set
+	//	shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
+	//	shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
+	//	shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
+	//	shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
 
-		//point lights set
-		std::string attributeName = "pointLights[";
-		for(int i = 0; i < NR_POINT_LIGHTS; ++i)
-		{
-			attributeName = attributeName + std::to_string(i) + "].";
-			
-			shader->SetVec3(attributeName + "position", pointLightVec[i]->GetPosition());
-			shader->SetVec3(attributeName + "ambient", pointLightVec[i]->GetAmbientColor());
-            shader->SetVec3(attributeName + "diffuse", pointLightVec[i]->GetDiffuseColor());
-            shader->SetVec3(attributeName + "specular", pointLightVec[i]->GetSpecularColor());
-            shader->SetFloat(attributeName + "constant", pointLightVec[i]->GetCosntant());
-            shader->SetFloat(attributeName + "linear", pointLightVec[i]->GetLinear());
-            shader->SetFloat(attributeName + "quadratic", pointLightVec[i]->GetQuadratic());
-			
-			attributeName = "pointLights[";
-		}
+	//	//point lights set
+	//	std::string attributeName = "pointLights[";
+	//	for(int i = 0; i < NR_POINT_LIGHTS; ++i)
+	//	{
+	//		attributeName = attributeName + std::to_string(i) + "].";
+	//		
+	//		shader->SetVec3(attributeName + "position", pointLightVec[i]->GetPosition());
+	//		shader->SetVec3(attributeName + "ambient", pointLightVec[i]->GetAmbientColor());
+ //           shader->SetVec3(attributeName + "diffuse", pointLightVec[i]->GetDiffuseColor());
+ //           shader->SetVec3(attributeName + "specular", pointLightVec[i]->GetSpecularColor());
+ //           shader->SetFloat(attributeName + "constant", pointLightVec[i]->GetCosntant());
+ //           shader->SetFloat(attributeName + "linear", pointLightVec[i]->GetLinear());
+ //           shader->SetFloat(attributeName + "quadratic", pointLightVec[i]->GetQuadratic());
+	//		
+	//		attributeName = "pointLights[";
+	//	}
+	//	
+	//	//spot light set
+	//	shader->SetVec3("spotLight.position", camera->GetPosition());
+	//	shader->SetVec3("spotLight.direction", camera->GetCameraFront());
+
+	//	shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
+	//	shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
+	//	shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
+	//	
+	//	shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
+	//	shader->SetFloat("spotLight.linear", spotLight->GetLinear());
+	//	shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
+	//	
+	//	shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+	//	shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+
+
+	//	
+	//	auto iter = shaderObjectElement.second->begin();
+	//	auto iterEnd = shaderObjectElement.second->end();
+
+	//	for(; iter != iterEnd; ++iter)
+	//	{
+	//		(*iter)->Render(shader);
+	//	}
+	//	
+	//	shader->UnUse();
+	//}
+
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("LitShader");
+	shader->Use();
+
+	//camera set
+	shader->SetMatrix("view", camera->GetViewMatrix());
+	shader->SetMatrix("projection", camera->GetProjMatrix());
+	shader->SetVec3("viewPos", camera->GetPosition());
+
+	//directional light set
+	shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
+	shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
+	shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
+	shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
+
+	//spot light set
+	shader->SetVec3("spotLight.position", camera->GetPosition());
+	shader->SetVec3("spotLight.direction", camera->GetCameraFront());
+
+	shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
+	shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
+	shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
+	
+	shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
+	shader->SetFloat("spotLight.linear", spotLight->GetLinear());
+	shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
+	
+	shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+	shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
 		
-		//spot light set
-		shader->SetVec3("spotLight.position", camera->GetPosition());
-		shader->SetVec3("spotLight.direction", camera->GetCameraFront());
+	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	shader->SetMatrix("model", modelMatrix);
+	
+	model->Draw(shader);
 
-		shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
-		shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
-		shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
-		
-		shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
-		shader->SetFloat("spotLight.linear", spotLight->GetLinear());
-		shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
-		
-		shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-		shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+	shader->UnUse();
 
-
-		
-		auto iter = shaderObjectElement.second->begin();
-		auto iterEnd = shaderObjectElement.second->end();
-
-		for(; iter != iterEnd; ++iter)
-		{
-			(*iter)->Render(shader);
-		}
-		
-		shader->UnUse();
-	}
 }
 
 void Game::Clear()
@@ -196,20 +235,20 @@ void Game::InitViewport(int x, int y, int width, int height)
 void Game::InitResourceManager()
 {
 	resourceManager = std::make_shared<ResourceManager>();
-	resourceManager->Init();
+	//resourceManager->CreateModel();
 
 	
-	resourceManager->CreateShader("UnLitShader", "Shader/UnLitVertexShader.vs", "Shader/UnLitFragmentShader.fs");
-	resourceManager->CreateShader("LitShader", "Shader/LitVertexShader.vs", "Shader/LitFragmentShader.fs");
+	resourceManager->CreateShader("UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
+	resourceManager->CreateShader("LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
 
 	
-	resourceManager->CreateTexture("Container", "Texture/container.jpg", false);
+	/*resourceManager->CreateTexture("Container", "Texture/container.jpg", false);
 	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", true);
 	resourceManager->CreateTexture("Container2", "Texture/container2.png", true);
 	resourceManager->CreateTexture("Container2_Specular", "Texture/container2_specular.png", true);
 
 	
-	resourceManager->CreateMaterial("Container2", "Container2", "Container2_Specular", 32.0f);
+	resourceManager->CreateMaterial("Container2", "Container2", "Container2_Specular", 32.0f);*/
 }
 
 void Game::InitLights()
@@ -223,7 +262,7 @@ void Game::InitLights()
 				0.0f, 0.0f, 0.0f);
 
 	
-	glm::vec3 pointLightColors[] ={
+	/*glm::vec3 pointLightColors[] ={
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 1.0f),
@@ -248,7 +287,7 @@ void Game::InitLights()
 
 		pointLightVec.push_back(pointLight);
 	}
-
+*/
 
 
 	spotLight = std::make_shared<Light>();

@@ -15,7 +15,7 @@ class Shader;
 class Object;
 class Light;
 class Material;
-
+class Model;
 
 class Game
 {
@@ -54,7 +54,7 @@ private :
 	std::unordered_map<unsigned int, std::shared_ptr<Object>> objectMap;
 	std::unordered_map<const char*, std::shared_ptr<std::list<std::shared_ptr<Object>>>> shaderObjectMap;
 
-
+	std::shared_ptr<Model> model;
 
 	bool isWireFrameMode = false;
 private :

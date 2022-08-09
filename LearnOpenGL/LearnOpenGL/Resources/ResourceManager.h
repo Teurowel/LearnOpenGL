@@ -24,21 +24,21 @@ public :
 		cube
 	};
 
-	void Init();
+	void CreateModel();
 	void CreateShader(const char* shaderKey, const char* vertexPath, const char* fragmentPath);
-	void CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical);
+	//void CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical);
 	void CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey, float shininess);
 	void Clear();
 
 	const std::shared_ptr<ModelData> GetModelData(EModel modelEnum) const;
 	const std::shared_ptr<Shader> GetShader(const char* shaderKey) const;
-	const std::shared_ptr<Texture> GetTexture(const char* textureKey) const;
+	//const std::shared_ptr<Texture> GetTexture(const char* textureKey) const;
 	const std::shared_ptr<Material> GetMaterial(const char* materialKey) const;
 
 private :
 	std::unordered_map<EModel, std::shared_ptr<ModelData>> modelDataMap;
 	std::unordered_map<const char*, std::shared_ptr<Shader>> shaderMap;
-	std::unordered_map<const char*, std::shared_ptr<Texture>> textureMap;
+	//std::unordered_map<const char*, std::shared_ptr<Texture>> textureMap;
 	std::unordered_map<const char*, std::shared_ptr<Material>> materialMap;
 
 	void LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize, unsigned int vertexStride);

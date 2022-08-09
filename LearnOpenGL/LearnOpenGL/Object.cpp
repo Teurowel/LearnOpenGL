@@ -1,15 +1,11 @@
 #include "Object.h"
 
 #include <glad/glad.h>
-#include <string>
 
 #include "Resources/ResourceManager.h"
-#include "Resources/Texture.h"
 #include "Resources/Shader.h"
 #include "Resources/ModelData.h"
-#include "Camera.h"
 #include "Game.h"
-#include "Light.h"
 #include "Resources/Material.h"
 
 Object::Object()
@@ -65,10 +61,10 @@ void Object::Render(std::shared_ptr<Shader> shader)
 	{
 		const std::shared_ptr<ResourceManager> resourceManager = game->GetResourceManager(); 
 		shader->SetInt("material.diffuse", 0);
-		resourceManager->GetTexture(material->GetDiffuseTextureKey())->Use(0);
+		//resourceManager->GetTexture(material->GetDiffuseTextureKey())->Use(0);
 
 		shader->SetInt("material.specular", 1);
-		resourceManager->GetTexture(material->GetSpecularTextureKey())->Use(1);
+		//resourceManager->GetTexture(material->GetSpecularTextureKey())->Use(1);
 		
 		shader->SetFloat("material.shininess", material->GetShininess());
 	}

@@ -4,11 +4,10 @@
 #include <iostream>
 
 #include "Shader.h"
-#include "Texture.h"
 #include "ModelData.h"
 #include "Material.h"
 
-void ResourceManager::Init()
+void ResourceManager::CreateModel()
 {
 	float triangleVertices[] = {
 		-1.0f, -0.5f, 0.0f,	0.0f, 0.0f, 0.0f,  0.0f, -1.0f,
@@ -87,13 +86,13 @@ void ResourceManager::CreateShader(const char* shaderKey, const char* vertexPath
 	shaderMap.insert(std::make_pair(shaderKey, shader));
 }
 
-void ResourceManager::CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical)
-{
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-	texture->Init(texturePath, flipVertical);
-
-	textureMap.insert(std::make_pair(textureKey, texture));
-}
+// void ResourceManager::CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical)
+// {
+// 	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+// 	texture->Init(texturePath, flipVertical);
+//
+// 	textureMap.insert(std::make_pair(textureKey, texture));
+// }
 
 void ResourceManager::CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey,
                                      float shininess)
@@ -116,10 +115,10 @@ void ResourceManager::Clear()
 		shader.second->Clear();
 	}
 
-	for (auto texture : textureMap)
-	{
-		texture.second->Clear();
-	}
+	// for (auto texture : textureMap)
+	// {
+	// 	texture.second->Clear();
+	// }
 
 	for(auto material : materialMap)
 	{
@@ -148,10 +147,10 @@ const std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) 
 	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Shader>>, std::shared_ptr<Shader>>(shaderMap, shaderKey);
 }
 
-const std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
-{
-	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Texture>>, std::shared_ptr<Texture>>(textureMap, textureKey);
-}
+// const std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
+// {
+// 	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Texture>>, std::shared_ptr<Texture>>(textureMap, textureKey);
+// }
 
 const std::shared_ptr<Material> ResourceManager::GetMaterial(const char* materialKey) const
 {
