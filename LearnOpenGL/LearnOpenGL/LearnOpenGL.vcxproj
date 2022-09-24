@@ -373,7 +373,8 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Resources\Shader.cpp">
+    <ClCompile Include="Resources\Shader\LitShader.cpp" />
+    <ClCompile Include="Resources\Shader\Shader.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -528,7 +529,8 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
     <ClInclude Include="Resources\Model.h" />
     <ClInclude Include="Resources\ModelData.h" />
     <ClInclude Include="Resources\ResourceManager.h" />
-    <ClInclude Include="Resources\Shader.h" />
+    <ClInclude Include="Resources\Shader\LitShader.h" />
+    <ClInclude Include="Resources\Shader\Shader.h" />
     <ClInclude Include="Resources\stb_image.h" />
   </ItemGroup>
   <ItemGroup>

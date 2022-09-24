@@ -35,9 +35,10 @@ public :
 	void OnMouseMove(double xpos, double ypos);
 	void OnMouseScroll(double xOffset, double yOffset);
 
-	const std::shared_ptr<ResourceManager> GetResourceManager();
-	const std::shared_ptr<Camera> GetCamera();
-	const std::shared_ptr<Light> GetLight();
+	const std::shared_ptr<ResourceManager> GetResourceManager() const;
+	const std::shared_ptr<Camera> GetCamera() const;
+	const std::shared_ptr<Light> GetDirectionalLight() const;
+	const std::shared_ptr<Light> GetSpotLight() const;
 	
 	GLFWwindow* GetWindow();
 

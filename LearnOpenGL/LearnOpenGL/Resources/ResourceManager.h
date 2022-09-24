@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+class Game;
 class Model;
 struct ModelData;
 
@@ -26,7 +27,7 @@ public :
 	};
 
 	void LoadModel(const std::string& path, const std::string& key);
-	void LoadShader(const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath);
+	void LoadShader(const Game* game, const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath);
 	void Clear();
 
 	const std::shared_ptr<Model> GetModel(const std::string& key) const;

@@ -9,8 +9,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void Shader::Init(const std::string& vertexPath, const std::string& fragmentPath)
+#include "../../Game.h"
+#include "../../Camera.h"
+#include "../../Light.h"
+
+void Shader::Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath)
 {
+	this->game = game;
+	
 	std::string vertexCode = "";
 	ReadShaderFromFile(vertexPath, vertexCode);
 
@@ -41,6 +47,37 @@ void Shader::Init(const std::string& vertexPath, const std::string& fragmentPath
 void Shader::Use()
 {
 	glUseProgram(shaderProgramID);
+
+	//camera set
+	const std::shared_ptr<Camera> camera = game->GetCamera();
+	SetMatrix("view", camera->GetViewMatrix());
+	SetMatrix("projection", camera->GetProjMatrix());
+	SetVec3("viewPos", camera->GetPosition());
+	SetFloat("cameraNear", camera->GetCameraNear());
+	SetFloat("cameraFar", camera->GetCameraFar());
+		
+	//directional light set
+	const std::shared_ptr<Light> directionalLight = game->GetDirectionalLight();
+	SetVec3("dirLight.direction", directionalLight->GetDirection());
+	SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
+	SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
+	SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
+
+	//spot light set
+	SetVec3("spotLight.position", camera->GetPosition());
+	SetVec3("spotLight.direction", camera->GetCameraFront());
+
+	const std::shared_ptr<Light> spotLight = game->GetSpotLight();
+	SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
+	SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
+	SetVec3("spotLight.specular", spotLight->GetSpecularColor());
+	
+	SetFloat("spotLight.constant", spotLight->GetCosntant());
+	SetFloat("spotLight.linear", spotLight->GetLinear());
+	SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
+	
+	SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+	SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
 }
 
 void Shader::UnUse()

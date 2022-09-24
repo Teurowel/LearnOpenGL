@@ -6,10 +6,12 @@
 #include <string>
 #include <glm/glm.hpp>
 
+class Game;
+
 class Shader
 {
 public :
-	void Init(const std::string& vertexPath, const std::string& fragmentPath);
+	void Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath);
 	void Use(); // use/activate the shader
 	void UnUse();
 	void Clear();
@@ -22,6 +24,8 @@ public :
 	void SetMatrix(const std::string& name, const glm::mat4& value) const;
 
 private :
+	const Game* game = nullptr;
+	
 	unsigned int shaderProgramID = 0; //the program ID
 
 	void ReadShaderFromFile(const std::string& shaderFilepath, std::string& shaderCode);

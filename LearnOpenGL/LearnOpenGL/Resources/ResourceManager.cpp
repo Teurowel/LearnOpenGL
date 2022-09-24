@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Shader.h"
+#include "Shader/Shader.h"
 #include "Model.h"
 
 // void ResourceManager::LoadModel(const std::string& path, const std::string& key)
@@ -72,13 +72,13 @@ void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 	}
 }
 
-void ResourceManager::LoadShader(const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath)
+void ResourceManager::LoadShader(const Game* game, const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath)
 {
 	auto iter = shaderMap.find(shaderKey);
 	if(iter == shaderMap.end())
 	{
 		std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-		shader->Init(vertexPath, fragmentPath);
+		shader->Init(game, vertexPath, fragmentPath);
 
 		shaderMap.insert(std::make_pair(shaderKey, shader));	
 	}

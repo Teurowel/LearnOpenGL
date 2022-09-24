@@ -1,12 +1,7 @@
 #include "Object.h"
 
-#include <glad/glad.h>
-
 #include "Resources/ResourceManager.h"
-#include "Resources/Shader.h"
-#include "Resources/ModelData.h"
-#include "Game.h"
-#include "Resources/Material.h"
+#include "Resources/Shader/Shader.h"
 #include "Resources/Model.h"
 
 Object::Object()

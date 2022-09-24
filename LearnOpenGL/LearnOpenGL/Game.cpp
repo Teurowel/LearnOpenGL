@@ -6,7 +6,7 @@
 
 #include "Camera.h"
 #include "Object.h"
-#include "Resources/Shader.h"
+#include "Resources/Shader/Shader.h"
 #include "Resources/ResourceManager.h"
 #include "Light.h"
 #include "Resources/Model.h"
@@ -91,34 +91,6 @@ void Game::Render()
 
 		shader->Use();
 
-		//camera set
-		shader->SetMatrix("view", camera->GetViewMatrix());
-		shader->SetMatrix("projection", camera->GetProjMatrix());
-		shader->SetVec3("viewPos", camera->GetPosition());
-		shader->SetFloat("cameraNear", camera->GetCameraNear());
-		shader->SetFloat("cameraFar", camera->GetCameraFar());
-		
-		//directional light set
-		shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
-		shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
-		shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
-		shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
-
-		//spot light set
-		shader->SetVec3("spotLight.position", camera->GetPosition());
-		shader->SetVec3("spotLight.direction", camera->GetCameraFront());
-
-		shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
-		shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
-		shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
-	
-		shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
-		shader->SetFloat("spotLight.linear", spotLight->GetLinear());
-		shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
-	
-		shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-		shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
-
 		auto iter = shaderObjectElement.second->begin();
 		auto iterEnd = shaderObjectElement.second->end();
 
@@ -198,8 +170,8 @@ void Game::InitResourceManager()
 	resourceManager = std::make_shared<ResourceManager>();
 	resourceManager->LoadModel("Asset/Objects/Backpack/backpack.obj", "Backpack");
 	
-	resourceManager->LoadShader("UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
-	resourceManager->LoadShader("LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
+	resourceManager->LoadShader(this, "UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
+	resourceManager->LoadShader(this, "LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
 }
 
 void Game::InitLights()
@@ -335,19 +307,24 @@ void Game::OnMouseScroll(double xOffset, double yOffset)
 	camera->OnMouseScroll(yOffset);
 }
 
-const std::shared_ptr<ResourceManager> Game::GetResourceManager()
+const std::shared_ptr<ResourceManager> Game::GetResourceManager() const
 {
 	return resourceManager;
 }
 
-const std::shared_ptr<Camera> Game::GetCamera()
+const std::shared_ptr<Camera> Game::GetCamera() const
 {
 	return camera;
 }
 
-const std::shared_ptr<Light> Game::GetLight()
+const std::shared_ptr<Light> Game::GetDirectionalLight() const
 {
 	return directionalLight;
+}
+
+const std::shared_ptr<Light> Game::GetSpotLight() const
+{
+	return spotLight;
 }
 
 GLFWwindow* Game::GetWindow()
