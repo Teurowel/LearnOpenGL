@@ -1,9 +1,15 @@
 #include "Shader.h"
+
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void Shader::Init(const char* vertexPath, const char* fragmentPath)
+void Shader::Init(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	std::string vertexCode = "";
 	ReadShaderFromFile(vertexPath, vertexCode);
@@ -72,7 +78,7 @@ void Shader::SetMatrix(const std::string& name, const glm::mat4& value) const
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::ReadShaderFromFile(const char* shaderFilepath, std::string& shaderCode)
+void Shader::ReadShaderFromFile(const std::string& shaderFilepath, std::string& shaderCode)
 {
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::ifstream shaderFile;

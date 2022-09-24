@@ -13,6 +13,7 @@ class ResourceManager;
 class Camera;
 class Game;
 class Material;
+class Model;
 
 class Object
 {
@@ -20,11 +21,8 @@ public :
 	Object();
 	~Object();
 
-	void Init(unsigned int objectID,
-	          std::shared_ptr<ModelData> modelData,
-	          std::shared_ptr<Material> material,
-	          bool hasColor, bool hasTexture, bool hasNormalVector, Game* game);
-	
+	void Init(unsigned int objectID, std::shared_ptr<Model> model);
+
 	void Update();
 	void Render(std::shared_ptr<Shader> shader);
 	void Clear();
@@ -38,10 +36,7 @@ public :
 private :
 	unsigned int objectID = 0;
 
-	unsigned int VAO = 0;
-
-	std::shared_ptr<ModelData> modelData = nullptr;
-	std::shared_ptr<Material> material = nullptr;
+	std::shared_ptr<Model> model = nullptr;
 
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -50,13 +45,6 @@ private :
 	glm::mat4 worldMatrix;
 
 	glm::vec3 unLitColor = glm::vec3(0.0f, 0.0f, 0.0f);
-
-
-	Game* game;
-
-	
-	
-	void InitVertexAttributes(bool hasColor, bool hasTexture, bool hasNormalVector);
 };
 
 #endif

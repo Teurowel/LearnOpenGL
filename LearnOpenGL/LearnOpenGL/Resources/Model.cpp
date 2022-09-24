@@ -6,7 +6,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Resources/stb_image.h"
+#include "stb_image.h"
 
 
 Model::Model(const std::string& path, bool gamma)
@@ -19,7 +19,20 @@ void Model::Draw(std::shared_ptr<Shader> shader)
 {
     for(unsigned int i = 0; i < meshes.size(); ++i)
     {
-        meshes[i].Draw(shader);       
+        meshes[i]->Draw(shader);       
+    }
+}
+
+void Model::Clear()
+{
+    for(int i =0; i < meshes.size(); ++i)
+    {
+        meshes[i]->Clear();
+    }
+
+    for(int i = 0; i < textures_loaded.size(); ++i)
+    {
+        glDeleteTextures(1, &textures_loaded[i].id); 
     }
 }
 
@@ -61,7 +74,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
     }
 }
 
-Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -153,7 +166,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
     }
 
-    return Mesh(vertices, indices, textures);
+    return std::make_shared<Mesh>(vertices, indices, textures);
 }
 
 std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)

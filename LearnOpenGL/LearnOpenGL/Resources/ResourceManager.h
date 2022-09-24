@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+class Model;
 struct ModelData;
 
 class Shader;
@@ -24,28 +25,21 @@ public :
 		cube
 	};
 
-	void CreateModel();
-	void CreateShader(const char* shaderKey, const char* vertexPath, const char* fragmentPath);
-	//void CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical);
-	void CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey, float shininess);
+	void LoadModel(const std::string& path, const std::string& key);
+	void LoadShader(const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath);
 	void Clear();
 
-	const std::shared_ptr<ModelData> GetModelData(EModel modelEnum) const;
-	const std::shared_ptr<Shader> GetShader(const char* shaderKey) const;
-	//const std::shared_ptr<Texture> GetTexture(const char* textureKey) const;
-	const std::shared_ptr<Material> GetMaterial(const char* materialKey) const;
+	const std::shared_ptr<Model> GetModel(const std::string& key) const;
+	const std::shared_ptr<Shader> GetShader(const std::string& key) const;
+
 
 private :
-	std::unordered_map<EModel, std::shared_ptr<ModelData>> modelDataMap;
-	std::unordered_map<const char*, std::shared_ptr<Shader>> shaderMap;
-	//std::unordered_map<const char*, std::shared_ptr<Texture>> textureMap;
-	std::unordered_map<const char*, std::shared_ptr<Material>> materialMap;
-
-	void LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize, unsigned int vertexStride);
-
+	std::unordered_map<std::string, std::shared_ptr<Model>> modelMap;
+	std::unordered_map<std::string, std::shared_ptr<Shader>> shaderMap;
+	
 
 	template<class MAP_TYPE, class ELEMENT_TYPE>
-	const ELEMENT_TYPE FindMapElement(MAP_TYPE map, const char* key) const;
+	const ELEMENT_TYPE FindMapElement(MAP_TYPE map, const std::string& key) const;
 };
 
 #endif

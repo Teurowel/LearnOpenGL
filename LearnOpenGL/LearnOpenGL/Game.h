@@ -52,7 +52,7 @@ private :
 	std::shared_ptr<Light> spotLight;
 
 	std::unordered_map<unsigned int, std::shared_ptr<Object>> objectMap;
-	std::unordered_map<const char*, std::shared_ptr<std::list<std::shared_ptr<Object>>>> shaderObjectMap;
+	std::unordered_map<std::string, std::shared_ptr<std::list<std::shared_ptr<Object>>>> shaderObjectMap;
 
 	std::shared_ptr<Model> model;
 
@@ -68,13 +68,11 @@ private :
 	void InitObjects();
 
 	std::shared_ptr<Object> CreateObject(unsigned int& objectID,
-		std::shared_ptr<ModelData> modelData,
-		const char* shaderKey,
-		std::shared_ptr<Material> material,
-		bool hasColor, bool hasTexture, bool hasNormalVector,
-		const glm::vec3& position,
-		const glm::vec3& scale);
-	void AddToShaderObjectMap(const char* shaderKey, std::shared_ptr<Object> object);
+										std::shared_ptr<Model> model,
+										const std::string& shaderKey,
+										const glm::vec3& position,
+										const glm::vec3& scale);
+	void AddToShaderObjectMap(const std::string& shaderKey, std::shared_ptr<Object> object);
 	
 
 	void ProcessInput(float deltaTime);

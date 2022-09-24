@@ -1,164 +1,114 @@
 #include "ResourceManager.h"
 
-#include <glad/glad.h>
 #include <iostream>
 
 #include "Shader.h"
-#include "ModelData.h"
-#include "Material.h"
+#include "Model.h"
 
-void ResourceManager::CreateModel()
-{
-	float triangleVertices[] = {
-		-1.0f, -0.5f, 0.0f,	0.0f, 0.0f, 0.0f,  0.0f, -1.0f,
-		 0.0f, 0.5f, 0.0f,	0.5f, 1.0f, 0.0f,  0.0f, -1.0f,
-		 1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,  0.0f, -1.0f,
-	};
-
-	float cubeVertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
-	};
-
-	LoadModel(EModel::triangle, triangleVertices, sizeof(triangleVertices), 32);
-	LoadModel(EModel::cube, cubeVertices, sizeof(cubeVertices), 32);
-}
-
-void ResourceManager::LoadModel(EModel modelType, float* vertices, GLsizeiptr verticesSize, unsigned int vertexStride)
-{
-	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>();
-	
-	glGenBuffers(1, &modelData->VBO); //Generate Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, modelData->VBO); //bind buffer at GL_ARRAY_BUFFER 
-	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW); //set data to GL_ARRAY_BUFFER, stored data in memory on graphics card
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	modelData->vertexCount = verticesSize / vertexStride;
-	
-	modelDataMap.insert(std::make_pair(modelType, modelData));
-}
-
-
-void ResourceManager::CreateShader(const char* shaderKey, const char* vertexPath, const char* fragmentPath)
-{
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-	shader->Init(vertexPath, fragmentPath);
-
-	shaderMap.insert(std::make_pair(shaderKey, shader));
-}
-
-// void ResourceManager::CreateTexture(const char* textureKey, const char* texturePath, bool flipVertical)
+// void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 // {
-// 	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-// 	texture->Init(texturePath, flipVertical);
+// 	// float triangleVertices[] = {
+// 	// 	-1.0f, -0.5f, 0.0f,	0.0f, 0.0f, 0.0f,  0.0f, -1.0f,
+// 	// 	 0.0f, 0.5f, 0.0f,	0.5f, 1.0f, 0.0f,  0.0f, -1.0f,
+// 	// 	 1.0f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f,  0.0f, -1.0f,
+// 	// };
+// 	//
+// 	// float cubeVertices[] = {
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+// 	//  0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+// 	//  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+// 	//  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+// 	// -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+// 	//
+// 	// -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+// 	//  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+// 	// -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+// 	// -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+// 	//
+// 	// -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+// 	// -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+// 	// -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+// 	// -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+// 	//
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+// 	//  0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f,  0.0f,
+// 	//  0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,  0.0f,  0.0f,
+// 	//  0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,  0.0f,  0.0f,
+// 	//  0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+// 	//
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f,  0.0f,
+// 	//  0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f, -1.0f,  0.0f,
+// 	//  0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f,  0.0f,
+// 	//  0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f,  0.0f,
+// 	// -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, -1.0f,  0.0f,
+// 	// -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f,  0.0f,
+// 	//
+// 	// -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+// 	//  0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f,  0.0f,
+// 	//  0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f,  0.0f,
+// 	// -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f,  0.0f,
+// 	// -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+// 	// };
+// 	//
+// 	// LoadModel(EModel::triangle, triangleVertices, sizeof(triangleVertices), 32);
+// 	// LoadModel(EModel::cube, cubeVertices, sizeof(cubeVertices), 32);
 //
-// 	textureMap.insert(std::make_pair(textureKey, texture));
+// 	CheckDuplicationAndLoadModel(path, key);
 // }
 
-void ResourceManager::CreateMaterial(const char* materialKey, const char* diffuseTextureKey, const char* specularTextureKey,
-                                     float shininess)
+void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 {
-	std::shared_ptr<Material> material = std::make_shared<Material>();
-	material->Init(diffuseTextureKey, specularTextureKey, shininess);
+	auto iter = modelMap.find(key);
+	if(iter == modelMap.end())
+	{
+		modelMap.insert(std::make_pair(key, std::make_shared<Model>(path)));
+	}
+}
 
-	materialMap.insert(std::make_pair(materialKey, material));
+void ResourceManager::LoadShader(const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath)
+{
+	auto iter = shaderMap.find(shaderKey);
+	if(iter == shaderMap.end())
+	{
+		std::shared_ptr<Shader> shader = std::make_shared<Shader>();
+		shader->Init(vertexPath, fragmentPath);
+
+		shaderMap.insert(std::make_pair(shaderKey, shader));	
+	}
 }
 
 void ResourceManager::Clear()
 {
-	for (auto modelData : modelDataMap)
+	for (auto model : modelMap)
 	{
-		glDeleteBuffers(1, &(modelData.second->VBO));
+		model.second->Clear();
 	}
 
 	for (auto shader : shaderMap)
 	{
 		shader.second->Clear();
 	}
-
-	// for (auto texture : textureMap)
-	// {
-	// 	texture.second->Clear();
-	// }
-
-	for(auto material : materialMap)
-	{
-		material.second->Clear();
-	}
 }
 
-const std::shared_ptr<ModelData> ResourceManager::GetModelData(EModel modelEnum) const
+const std::shared_ptr<Model> ResourceManager::GetModel(const std::string& key) const
 {
-	auto foundIter = modelDataMap.find(modelEnum);
-	if (foundIter != modelDataMap.end())
-	{
-		return foundIter->second;
-	}
-	else
-	{
-		std::cout << "ResourceManager::GetModelData Error, not found modelEnum : " << modelEnum << std::endl;
-		return 0;
-	}
-	
-	return 0;
+	return FindMapElement<std::unordered_map<std::string, std::shared_ptr<Model>>, std::shared_ptr<Model>>(modelMap, key);
 }
 
-const std::shared_ptr<Shader> ResourceManager::GetShader(const char* shaderKey) const
+const std::shared_ptr<Shader> ResourceManager::GetShader(const std::string& key) const
 {
-	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Shader>>, std::shared_ptr<Shader>>(shaderMap, shaderKey);
-}
-
-// const std::shared_ptr<Texture> ResourceManager::GetTexture(const char* textureKey) const
-// {
-// 	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Texture>>, std::shared_ptr<Texture>>(textureMap, textureKey);
-// }
-
-const std::shared_ptr<Material> ResourceManager::GetMaterial(const char* materialKey) const
-{
-	return FindMapElement<std::unordered_map<const char*, std::shared_ptr<Material>>, std::shared_ptr<Material>>(materialMap, materialKey);
+	return FindMapElement<std::unordered_map<std::string, std::shared_ptr<Shader>>, std::shared_ptr<Shader>>(shaderMap, key);
 }
 
 template <class MAP_TYPE, class ELEMENT_TYPE>
-const ELEMENT_TYPE ResourceManager::FindMapElement(MAP_TYPE map, const char* key) const
+const ELEMENT_TYPE ResourceManager::FindMapElement(MAP_TYPE map, const std::string& key) const
 {
 	auto foundIterator = map.find(key);
 	if (foundIterator != map.end())

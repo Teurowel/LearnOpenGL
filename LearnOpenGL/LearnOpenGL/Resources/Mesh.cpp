@@ -1,7 +1,7 @@
 ﻿#include "Mesh.h"
 
 #include <glad/glad.h>
-#include "Resources/Shader.h"
+#include "Shader.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, std::vector<Texture> textures)
 {
@@ -55,6 +55,13 @@ void Mesh::Draw(std::shared_ptr<Shader> shader)
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
+}
+
+void Mesh::Clear()
+{
+    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
 }
 
 void Mesh::SetupMesh()

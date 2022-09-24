@@ -4,18 +4,12 @@
 #include <glad/glad.h> // include glad to get all the required OpenGL headers
 
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <unordered_map>
 
 class Shader
 {
 public :
-	void Init(const char* vertexPath, const char* fragmentPath);
+	void Init(const std::string& vertexPath, const std::string& fragmentPath);
 	void Use(); // use/activate the shader
 	void UnUse();
 	void Clear();
@@ -30,7 +24,7 @@ public :
 private :
 	unsigned int shaderProgramID = 0; //the program ID
 
-	void ReadShaderFromFile(const char* shaderFilepath, std::string& shaderCode);
+	void ReadShaderFromFile(const std::string& shaderFilepath, std::string& shaderCode);
 	int CreateAndCompileShader(const char* shaderSource, GLenum shaderType);
 	void CheckShaderCompile(unsigned int shaderID);
 	void CreateAndLinkShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID);

@@ -33,6 +33,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     void Draw(std::shared_ptr<Shader> shader);
 
+    void Clear();
 private :
     //mesh data
     std::vector<Vertex>         vertices;

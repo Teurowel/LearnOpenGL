@@ -9,7 +9,7 @@
 #include "Resources/Shader.h"
 #include "Resources/ResourceManager.h"
 #include "Light.h"
-#include "Model.h"
+#include "Resources/Model.h"
 
 const float Game::SCREEN_WIDTH = 800.0f;
 const float Game::SCREEN_HEIGHT = 600.0f;
@@ -46,12 +46,7 @@ bool Game::Init()
 
 	InitLights();
 	
-	
-	
-	
-	//InitObjects();
-	
-	model = std::make_shared<Model>("Asset/Objects/Backpack/backpack.obj");
+	InitObjects();
 	
 	return result;
 }
@@ -69,25 +64,7 @@ void Game::Update(float deltaTime)
 void Game::Render()
 {
 	ClearBuffer();
-
-	//std::shared_ptr<Shader> shader = nullptr;
-	//for(auto shaderObjectElement : shaderObjectMap)
-	//{
-	//	shader = resourceManager->GetShader(shaderObjectElement.first);
-
-	//	shader->Use();
-
-	//	//camera set
-	//	shader->SetMatrix("view", camera->GetViewMatrix());
-	//	shader->SetMatrix("projection", camera->GetProjMatrix());
-	//	shader->SetVec3("viewPos", camera->GetPosition());
-
-	//	//directional light set
-	//	shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
-	//	shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
-	//	shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
-	//	shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
-
+	
 	//	//point lights set
 	//	std::string attributeName = "pointLights[";
 	//	for(int i = 0; i < NR_POINT_LIGHTS; ++i)
@@ -105,70 +82,51 @@ void Game::Render()
 	//		attributeName = "pointLights[";
 	//	}
 	//	
-	//	//spot light set
-	//	shader->SetVec3("spotLight.position", camera->GetPosition());
-	//	shader->SetVec3("spotLight.direction", camera->GetCameraFront());
-
-	//	shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
-	//	shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
-	//	shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
-	//	
-	//	shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
-	//	shader->SetFloat("spotLight.linear", spotLight->GetLinear());
-	//	shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
-	//	
-	//	shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-	//	shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
 
 
-	//	
-	//	auto iter = shaderObjectElement.second->begin();
-	//	auto iterEnd = shaderObjectElement.second->end();
+	std::shared_ptr<Shader> shader = nullptr;
+	for(auto shaderObjectElement : shaderObjectMap)
+	{
+		shader = resourceManager->GetShader(shaderObjectElement.first);
 
-	//	for(; iter != iterEnd; ++iter)
-	//	{
-	//		(*iter)->Render(shader);
-	//	}
-	//	
-	//	shader->UnUse();
-	//}
+		shader->Use();
 
-	std::shared_ptr<Shader> shader = resourceManager->GetShader("LitShader");
-	shader->Use();
+		//camera set
+		shader->SetMatrix("view", camera->GetViewMatrix());
+		shader->SetMatrix("projection", camera->GetProjMatrix());
+		shader->SetVec3("viewPos", camera->GetPosition());
 
-	//camera set
-	shader->SetMatrix("view", camera->GetViewMatrix());
-	shader->SetMatrix("projection", camera->GetProjMatrix());
-	shader->SetVec3("viewPos", camera->GetPosition());
+		//directional light set
+		shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
+		shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
+		shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
+		shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
 
-	//directional light set
-	shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
-	shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
-	shader->SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
-	shader->SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
+		//spot light set
+		shader->SetVec3("spotLight.position", camera->GetPosition());
+		shader->SetVec3("spotLight.direction", camera->GetCameraFront());
 
-	//spot light set
-	shader->SetVec3("spotLight.position", camera->GetPosition());
-	shader->SetVec3("spotLight.direction", camera->GetCameraFront());
-
-	shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
-	shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
-	shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
+		shader->SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
+		shader->SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
+		shader->SetVec3("spotLight.specular", spotLight->GetSpecularColor());
 	
-	shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
-	shader->SetFloat("spotLight.linear", spotLight->GetLinear());
-	shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
+		shader->SetFloat("spotLight.constant", spotLight->GetCosntant());
+		shader->SetFloat("spotLight.linear", spotLight->GetLinear());
+		shader->SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
 	
-	shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-	shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+		shader->SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+		shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+
+		auto iter = shaderObjectElement.second->begin();
+		auto iterEnd = shaderObjectElement.second->end();
+
+		for(; iter != iterEnd; ++iter)
+		{
+			(*iter)->Render(shader);
+		}
 		
-	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	shader->SetMatrix("model", modelMatrix);
-	
-	model->Draw(shader);
-
-	shader->UnUse();
-
+		shader->UnUse();
+	}
 }
 
 void Game::Clear()
@@ -235,20 +193,10 @@ void Game::InitViewport(int x, int y, int width, int height)
 void Game::InitResourceManager()
 {
 	resourceManager = std::make_shared<ResourceManager>();
-	//resourceManager->CreateModel();
-
+	resourceManager->LoadModel("Asset/Objects/Backpack/backpack.obj", "Backpack");
 	
-	resourceManager->CreateShader("UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
-	resourceManager->CreateShader("LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
-
-	
-	/*resourceManager->CreateTexture("Container", "Texture/container.jpg", false);
-	resourceManager->CreateTexture("Awesomeface", "Texture/awesomeface.png", true);
-	resourceManager->CreateTexture("Container2", "Texture/container2.png", true);
-	resourceManager->CreateTexture("Container2_Specular", "Texture/container2_specular.png", true);
-
-	
-	resourceManager->CreateMaterial("Container2", "Container2", "Container2_Specular", 32.0f);*/
+	resourceManager->LoadShader("UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
+	resourceManager->LoadShader("LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
 }
 
 void Game::InitLights()
@@ -303,51 +251,48 @@ void Game::InitObjects()
 {
 	unsigned int objectID = 0;
 
-	for(int i =0 ; i < NR_POINT_LIGHTS; ++i)
-	{
-		std::shared_ptr<Object> pointLight = CreateObject(objectID,
-				resourceManager->GetModelData(ResourceManager::EModel::cube),
-				"UnLitShader",
-				nullptr,
-				false, true, true,
-				pointLightVec[i]->GetPosition(),
-				glm::vec3(0.1f, 0.1f, 0.1f));
-
-		pointLight->SetUnLitColor(pointLightVec[i]->GetDiffuseColor());
-	}
+	// for(int i =0 ; i < NR_POINT_LIGHTS; ++i)
+	// {
+	// 	std::shared_ptr<Object> pointLight = CreateObject(objectID,
+	// 			resourceManager->GetModelData(ResourceManager::EModel::cube),
+	// 			"UnLitShader",
+	// 			nullptr,
+	// 			false, true, true,
+	// 			pointLightVec[i]->GetPosition(),
+	// 			glm::vec3(0.1f, 0.1f, 0.1f));
+	//
+	// 	pointLight->SetUnLitColor(pointLightVec[i]->GetDiffuseColor());
+	// }
 	
 	
 	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetModel("Backpack"),
 		"LitShader",
-		resourceManager->GetMaterial("Container2"),
-		false, true, true,
 		glm::vec3(-2.0f, 0.0f, -2.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
 
 	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
+		resourceManager->GetModel("Backpack"),
 		"LitShader",
-		resourceManager->GetMaterial("Container2"),
-		false, true, true,
 		glm::vec3(2.0f, 0.0f, -2.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
 
-	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
-		"LitShader",
-		resourceManager->GetMaterial("Container2"),
-		false, true, true,
-		glm::vec3(2.0f, 0.0f, 2.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
 
-	CreateObject(objectID,
-		resourceManager->GetModelData(ResourceManager::EModel::cube),
-		"LitShader",
-		resourceManager->GetMaterial("Container2"),
-		false, true, true,
-		glm::vec3(-2.0f, 0.0f, 2.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
+	// CreateObject(objectID,
+	// 	resourceManager->GetModelData(ResourceManager::EModel::cube),
+	// 	"LitShader",
+	// 	resourceManager->GetMaterial("Container2"),
+	// 	false, true, true,
+	// 	glm::vec3(2.0f, 0.0f, 2.0f),
+	// 	glm::vec3(1.0f, 1.0f, 1.0f));
+	//
+	// CreateObject(objectID,
+	// 	resourceManager->GetModelData(ResourceManager::EModel::cube),
+	// 	"LitShader",
+	// 	resourceManager->GetMaterial("Container2"),
+	// 	false, true, true,
+	// 	glm::vec3(-2.0f, 0.0f, 2.0f),
+	// 	glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void Game::ProcessInput(float deltaTime)
@@ -423,15 +368,13 @@ void Game::ClearBuffer()
 }
 
 std::shared_ptr<Object> Game::CreateObject(unsigned int& objectID,
-                        std::shared_ptr<ModelData> modelData,
-                        const char* shaderKey,
-                        std::shared_ptr<Material> material,
-                        bool hasColor, bool hasTexture, bool hasNormalVector,
+                        std::shared_ptr<Model> model,
+                        const std::string& shaderKey,
                         const glm::vec3& position,
                         const glm::vec3& scale)
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	object->Init(objectID, modelData, material, hasColor, hasTexture, hasNormalVector, this);
+	object->Init(objectID, model);
 	object->SetPosition(position);
 	object->SetScale(scale);
 	
@@ -444,7 +387,7 @@ std::shared_ptr<Object> Game::CreateObject(unsigned int& objectID,
 	return object;
 }
 
-void Game::AddToShaderObjectMap(const char* shaderKey, std::shared_ptr<Object> object)
+void Game::AddToShaderObjectMap(const std::string& shaderKey, std::shared_ptr<Object> object)
 {
 	auto it = shaderObjectMap.find(shaderKey);
 	if(it != shaderObjectMap.end())
