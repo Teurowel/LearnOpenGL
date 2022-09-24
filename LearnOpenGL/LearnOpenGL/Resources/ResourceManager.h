@@ -31,7 +31,8 @@ public :
 		None,
 		UnLit,
 		Lit,
-		DepthTesting
+		DepthTesting,
+		StencilTesting
 	};
 
 	void LoadModel(const std::string& path, const std::string& key);

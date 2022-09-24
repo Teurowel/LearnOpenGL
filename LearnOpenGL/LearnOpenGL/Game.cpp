@@ -84,24 +84,116 @@ void Game::Render()
 	//	
 
 
-	std::shared_ptr<Shader> shader = nullptr;
-	for(auto shaderObjectElement : shaderObjectMap)
-	{
-		shader = resourceManager->GetShader(shaderObjectElement.first);
+	// std::shared_ptr<Shader> shader = nullptr;
+	// for(auto shaderObjectElement : shaderObjectMap)
+	// {
+	// 	shader = resourceManager->GetShader(shaderObjectElement.first);
+	//
+	// 	shader->Use();
+	//
+	// 	auto iter = shaderObjectElement.second->begin();
+	// 	auto iterEnd = shaderObjectElement.second->end();
+	//
+	// 	for(; iter != iterEnd; ++iter)
+	// 	{
+	// 		(*iter)->Render(shader);
+	// 	}
+	// 	
+	// 	shader->UnUse();
+	// }
 
-		shader->Use();
-
-		auto iter = shaderObjectElement.second->begin();
-		auto iterEnd = shaderObjectElement.second->end();
-
-		for(; iter != iterEnd; ++iter)
-		{
-			(*iter)->Render(shader);
-		}
-		
-		shader->UnUse();
-	}
+	RenderUnLitShader();
+	
+	RenderLitShader();
+	RenderStencilTestingShader();
+	
+	RenderDepthTestingShader();
 }
+
+void Game::RenderUnLitShader()
+{
+	glStencilMask(0x00); //Don't update stencil buffer
+	
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("UnLitShader");
+
+	shader->Use();
+
+	RenderShaderObjectList("UnLitShader", shader);
+		
+	shader->UnUse();
+
+	glStencilMask(0xFF);
+}
+
+void Game::RenderLitShader()
+{
+	//Writing to the stencil buffer
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF); 
+	
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("LitShader");
+
+	shader->Use();
+
+	RenderShaderObjectList("LitShader", shader);
+		
+	shader->UnUse();
+
+	glStencilMask(0x00);
+}
+
+void Game::RenderDepthTestingShader()
+{
+	glStencilMask(0x00); //Don't update stencil buffer
+	
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("DepthTestingShader");
+
+	shader->Use();
+
+	RenderShaderObjectList("DepthTestingShader", shader);
+		
+	shader->UnUse();
+
+	glStencilMask(0xFF);
+}
+
+void Game::RenderStencilTestingShader()
+{
+	//disable stencil writing, and compare to stencil buffer, only draw area which doesn't have 1
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST); //turn off depth test for outline
+	
+	
+	std::shared_ptr<Shader> shader = resourceManager->GetShader("StencilTestingShader");
+
+	shader->Use();
+
+	RenderShaderObjectList("StencilTestingShader", shader);
+		
+	shader->UnUse();
+
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+}
+
+
+
+void Game::RenderShaderObjectList(std::string key, std::shared_ptr<Shader> shader)
+{
+	auto shaderObjectList = shaderObjectMap[key];
+	auto iter = shaderObjectList->begin();
+	auto iterEnd = shaderObjectList->end();
+
+	for(; iter != iterEnd; ++iter)
+	{
+		(*iter)->Render(shader);
+	}	
+}
+
+
+
 
 void Game::Clear()
 {
@@ -152,8 +244,12 @@ void Game::InitSystem()
 	InitViewport(0, 0, (int)SCREEN_WIDTH, (int)SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LESS);
 
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//wherever we move the mouse it won't be visible and it should not leave the window.
 }
 
@@ -179,6 +275,9 @@ void Game::InitResourceManager()
 	resourceManager->LoadShader(this,
 		"DepthTestingShader", "Asset/Shaders/DepthTestingVertexShader.vs", "Asset/Shaders/DepthTestingFragmentShader.fs",
 		ResourceManager::DepthTesting);
+	resourceManager->LoadShader(this,
+		"StencilTestingShader", "Asset/Shaders/StencilTestingVertexShader.vs", "Asset/Shaders/StencilTestingFragmentShader.fs",
+		ResourceManager::StencilTesting);
 }
 
 void Game::InitLights()
@@ -246,14 +345,6 @@ void Game::InitObjects()
 	// 	pointLight->SetUnLitColor(pointLightVec[i]->GetDiffuseColor());
 	// }
 	
-	// for(int i = 0; i < 50; ++i)
-	// {
-	// 	CreateObject(objectID,
-	// 		resourceManager->GetModel("Backpack"),
-	// 		"LitShader",
-	// 		glm::vec3(i, 0.0f, -(i * 2)),
-	// 		glm::vec3(1.0f, 1.0f, 1.0f));	
-	// }
 
 	std::shared_ptr<Object> unLitObj = CreateObject(objectID,
 		resourceManager->GetModel("Backpack"),
@@ -261,7 +352,16 @@ void Game::InitObjects()
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
 	unLitObj->SetUnLitColor(glm::vec3(1.0f, 0.0f, 0.0f));
+
+	unLitObj = CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"UnLitShader",
+		glm::vec3(0.0f, 0.0f, -4.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+	unLitObj->SetUnLitColor(glm::vec3(0.0f, 1.0f, 0.0f));
 	
+
+
 	
 	CreateObject(objectID,
 		resourceManager->GetModel("Backpack"),
@@ -271,8 +371,36 @@ void Game::InitObjects()
 
 	CreateObject(objectID,
 		resourceManager->GetModel("Backpack"),
+		"LitShader",
+		glm::vec3(4.0f, 0.0f, -4.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	float scale = 1.025f;
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"StencilTestingShader",
+		glm::vec3(4.0f, 0.0f, 0.0f),
+		glm::vec3(scale, scale, scale));
+
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"StencilTestingShader",
+		glm::vec3(4.0f, 0.0f, -4.0f),
+		glm::vec3(scale, scale, scale));
+
+
+	
+	
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
 		"DepthTestingShader",
 		glm::vec3(8.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"DepthTestingShader",
+		glm::vec3(8.0f, 0.0f, -4.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
@@ -350,7 +478,7 @@ void Game::EnableWireFrameMode(bool enable)
 void Game::ClearBuffer()
 {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //set clear color
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //clear Color_Buffer using clear color, clear depth buffer, clear stencil buffer
 }
 
 std::shared_ptr<Object> Game::CreateObject(unsigned int& objectID,

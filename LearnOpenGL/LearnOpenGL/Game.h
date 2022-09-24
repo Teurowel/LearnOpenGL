@@ -80,6 +80,11 @@ private :
 	
 
 	void ClearBuffer();
+	void RenderUnLitShader();
+	void RenderLitShader();
+	void RenderDepthTestingShader();
+	void RenderStencilTestingShader();
+	void RenderShaderObjectList(std::string key, std::shared_ptr<Shader> shader);
 
 	void EnableWireFrameMode(bool enable);
 };

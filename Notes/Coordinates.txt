@@ -1,5 +1,14 @@
 
-(                                                       vertex shader                                                              )                          (fragment shader)
+(                                                       vertex shader                                                              )                     
 Local coordinate -> World coordinate -> View coordinate -> clip coordinates(homogeneous coordinates) -> normalized device coordinate -> screen coordinate
 	
 world matrix -> view matrix -> projection matrix -> (from here, openGL do) frustum culling(clipping) -> perspective devide(devied by w) -> viewport transform
+
+
+
+
+screen coordinate -> rasterization -> fragment shader -> Per-Sample Operations
+
+
+
+Per-Sample Operations : Scissor Test -> Stencil Test -> Depth Test -> Blending -> Logical Operation -> Write Mask

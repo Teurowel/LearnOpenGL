@@ -447,6 +447,7 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Resources\Shader\StencilTestingShader.cpp" />
     <ClCompile Include="Resources\Shader\UnLitShader.cpp" />
     <ClCompile Include="Resources\stb_image.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -534,6 +535,7 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
     <ClInclude Include="Resources\Shader\DepthTestingShader.h" />
     <ClInclude Include="Resources\Shader\LitShader.h" />
     <ClInclude Include="Resources\Shader\Shader.h" />
+    <ClInclude Include="Resources\Shader\StencilTestingShader.h" />
     <ClInclude Include="Resources\Shader\UnLitShader.h" />
     <ClInclude Include="Resources\stb_image.h" />
   </ItemGroup>
@@ -543,10 +545,12 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Asset\Shaders\DepthTestingFragmentShader.fs" />
+    <Compile Include="Asset\Shaders\StencilTestingFragmentShader.fs" />
     <Compile Include="Asset\Shaders\UnLitFragmentShader.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Asset\Shaders\DepthTestingVertexShader.vs" />
+    <Content Include="Asset\Shaders\StencilTestingVertexShader.vs" />
     <Content Include="Asset\Shaders\UnLitVertexShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

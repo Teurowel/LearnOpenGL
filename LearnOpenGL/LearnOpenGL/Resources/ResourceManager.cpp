@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "Shader/DepthTestingShader.h"
 #include "Shader/LitShader.h"
+#include "Shader/StencilTestingShader.h"
 
 // void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 // {
@@ -94,6 +95,10 @@ void ResourceManager::LoadShader(const Game* game,
 
 		case DepthTesting:
 			shader = std::make_shared<DepthTestingShader>();
+			break;
+
+		case StencilTesting:
+			shader = std::make_shared<StencilTestingShader>();
 			break;
 
 		default :
