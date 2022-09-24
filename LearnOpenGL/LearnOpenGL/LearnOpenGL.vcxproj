@@ -446,6 +446,7 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Resources\Shader\UnLitShader.cpp" />
     <ClCompile Include="Resources\stb_image.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -531,6 +532,7 @@ xcopy "$(ProjectDir)Asset\*.*" "$(TargetDir)Asset" /Y /I /E</Command>
     <ClInclude Include="Resources\ResourceManager.h" />
     <ClInclude Include="Resources\Shader\LitShader.h" />
     <ClInclude Include="Resources\Shader\Shader.h" />
+    <ClInclude Include="Resources\Shader\UnLitShader.h" />
     <ClInclude Include="Resources\stb_image.h" />
   </ItemGroup>
   <ItemGroup>

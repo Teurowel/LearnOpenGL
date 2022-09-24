@@ -11,11 +11,12 @@
 
 #include "../../Game.h"
 #include "../../Camera.h"
-#include "../../Light.h"
 
-void Shader::Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath)
+void Shader::Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath, ResourceManager::eShaderType
+                  shaderType)
 {
 	this->game = game;
+	this->shaderType = shaderType;
 	
 	std::string vertexCode = "";
 	ReadShaderFromFile(vertexPath, vertexCode);
@@ -55,29 +56,6 @@ void Shader::Use()
 	SetVec3("viewPos", camera->GetPosition());
 	SetFloat("cameraNear", camera->GetCameraNear());
 	SetFloat("cameraFar", camera->GetCameraFar());
-		
-	//directional light set
-	const std::shared_ptr<Light> directionalLight = game->GetDirectionalLight();
-	SetVec3("dirLight.direction", directionalLight->GetDirection());
-	SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
-	SetVec3("dirLight.diffuse", directionalLight->GetDiffuseColor());
-	SetVec3("dirLight.specular", directionalLight->GetSpecularColor());
-
-	//spot light set
-	SetVec3("spotLight.position", camera->GetPosition());
-	SetVec3("spotLight.direction", camera->GetCameraFront());
-
-	const std::shared_ptr<Light> spotLight = game->GetSpotLight();
-	SetVec3("spotLight.ambient", spotLight->GetAmbientColor());
-	SetVec3("spotLight.diffuse", spotLight->GetDiffuseColor());
-	SetVec3("spotLight.specular", spotLight->GetSpecularColor());
-	
-	SetFloat("spotLight.constant", spotLight->GetCosntant());
-	SetFloat("spotLight.linear", spotLight->GetLinear());
-	SetFloat("spotLight.quadratic", spotLight->GetQuadratic());
-	
-	SetFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-	SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
 }
 
 void Shader::UnUse()
@@ -113,6 +91,11 @@ void Shader::SetVec3(const std::string& name, const glm::vec3& value) const
 void Shader::SetMatrix(const std::string& name, const glm::mat4& value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+ResourceManager::eShaderType Shader::GetShaderType() const
+{
+	return shaderType;
 }
 
 void Shader::ReadShaderFromFile(const std::string& shaderFilepath, std::string& shaderCode)

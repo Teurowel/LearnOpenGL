@@ -170,8 +170,12 @@ void Game::InitResourceManager()
 	resourceManager = std::make_shared<ResourceManager>();
 	resourceManager->LoadModel("Asset/Objects/Backpack/backpack.obj", "Backpack");
 	
-	resourceManager->LoadShader(this, "UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs");
-	resourceManager->LoadShader(this, "LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs");
+	resourceManager->LoadShader(this,
+		"UnLitShader", "Asset/Shaders/UnLitVertexShader.vs", "Asset/Shaders/UnLitFragmentShader.fs",
+		ResourceManager::UnLit);
+	resourceManager->LoadShader(this,
+		"LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs",
+		ResourceManager::Lit);
 }
 
 void Game::InitLights()
@@ -239,38 +243,28 @@ void Game::InitObjects()
 	// 	pointLight->SetUnLitColor(pointLightVec[i]->GetDiffuseColor());
 	// }
 	
-	for(int i = 0; i < 50; ++i)
-	{
-		CreateObject(objectID,
-			resourceManager->GetModel("Backpack"),
-			"LitShader",
-			glm::vec3(i, 0.0f, -(i * 2)),
-			glm::vec3(1.0f, 1.0f, 1.0f));	
-	}
+	// for(int i = 0; i < 50; ++i)
+	// {
+	// 	CreateObject(objectID,
+	// 		resourceManager->GetModel("Backpack"),
+	// 		"LitShader",
+	// 		glm::vec3(i, 0.0f, -(i * 2)),
+	// 		glm::vec3(1.0f, 1.0f, 1.0f));	
+	// }
+
+	std::shared_ptr<Object> unLitObj = CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"UnLitShader",
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+	unLitObj->SetUnLitColor(glm::vec3(1.0f, 0.0f, 0.0f));
 	
-
-	// CreateObject(objectID,
-	// 	resourceManager->GetModel("Backpack"),
-	// 	"LitShader",
-	// 	glm::vec3(1.0f, 0.0f, -2.0f),
-	// 	glm::vec3(1.0f, 1.0f, 1.0f));
-
-
-	// CreateObject(objectID,
-	// 	resourceManager->GetModelData(ResourceManager::EModel::cube),
-	// 	"LitShader",
-	// 	resourceManager->GetMaterial("Container2"),
-	// 	false, true, true,
-	// 	glm::vec3(2.0f, 0.0f, 2.0f),
-	// 	glm::vec3(1.0f, 1.0f, 1.0f));
-	//
-	// CreateObject(objectID,
-	// 	resourceManager->GetModelData(ResourceManager::EModel::cube),
-	// 	"LitShader",
-	// 	resourceManager->GetMaterial("Container2"),
-	// 	false, true, true,
-	// 	glm::vec3(-2.0f, 0.0f, 2.0f),
-	// 	glm::vec3(1.0f, 1.0f, 1.0f));
+	
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"LitShader",
+		glm::vec3(4.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void Game::ProcessInput(float deltaTime)

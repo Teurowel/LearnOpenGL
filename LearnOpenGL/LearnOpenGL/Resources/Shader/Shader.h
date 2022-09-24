@@ -6,13 +6,16 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "../ResourceManager.h"
+
 class Game;
 
 class Shader
 {
 public :
-	void Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath);
-	void Use(); // use/activate the shader
+	void Init(const Game* game, const std::string& vertexPath, const std::string& fragmentPath, ResourceManager::eShaderType
+	          shaderType);
+	virtual void Use(); // use/activate the shader
 	void UnUse();
 	void Clear();
 
@@ -23,9 +26,9 @@ public :
 	void SetVec3(const std::string& name, const glm::vec3& value) const;
 	void SetMatrix(const std::string& name, const glm::mat4& value) const;
 
+	ResourceManager::eShaderType GetShaderType() const;
 private :
-	const Game* game = nullptr;
-	
+	ResourceManager::eShaderType shaderType = ResourceManager::None;
 	unsigned int shaderProgramID = 0; //the program ID
 
 	void ReadShaderFromFile(const std::string& shaderFilepath, std::string& shaderCode);
@@ -34,5 +37,8 @@ private :
 	void CreateAndLinkShaderProgram(unsigned int vertexShaderID, unsigned int fragmentShaderID);
 	void CheckShaderProgramLink();
 	void DeleteShader(unsigned int vertexShaderID, unsigned int fragmentShaderID);
+
+protected :
+	const Game* game = nullptr;
 };
 #endif

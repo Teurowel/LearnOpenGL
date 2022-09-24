@@ -4,6 +4,7 @@
 
 #include "Shader/Shader.h"
 #include "Model.h"
+#include "Shader/LitShader.h"
 
 // void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 // {
@@ -72,13 +73,28 @@ void ResourceManager::LoadModel(const std::string& path, const std::string& key)
 	}
 }
 
-void ResourceManager::LoadShader(const Game* game, const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath)
+void ResourceManager::LoadShader(const Game* game,
+	const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath,
+	eShaderType shaderType)
 {
 	auto iter = shaderMap.find(shaderKey);
 	if(iter == shaderMap.end())
 	{
-		std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-		shader->Init(game, vertexPath, fragmentPath);
+		std::shared_ptr<Shader> shader = nullptr;
+		switch(shaderType)
+		{
+		case UnLit :
+			shader = std::make_shared<LitShader>();
+			break;
+
+		case Lit :
+			shader = std::make_shared<LitShader>();
+			break;
+
+		default :
+			break;
+		}
+		shader->Init(game, vertexPath, fragmentPath, shaderType);
 
 		shaderMap.insert(std::make_pair(shaderKey, shader));	
 	}

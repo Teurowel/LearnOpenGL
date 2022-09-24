@@ -30,7 +30,11 @@ void Object::Update()
 
 void Object::Render(std::shared_ptr<Shader> shader)
 {
-	shader->SetVec3("unLitColor", unLitColor);
+	if(shader->GetShaderType() == ResourceManager::UnLit)
+	{
+		shader->SetVec3("unLitColor", unLitColor);	
+	}
+	
 	
 	shader->SetMatrix("model", worldMatrix);
 

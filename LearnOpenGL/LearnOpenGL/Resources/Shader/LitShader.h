@@ -3,10 +3,9 @@
 
 #include "Shader.h"
 
-class LitShader : Shader
+class LitShader : public Shader
 {
-    
-    
+    void Use() override;    
 };
 
 #endif

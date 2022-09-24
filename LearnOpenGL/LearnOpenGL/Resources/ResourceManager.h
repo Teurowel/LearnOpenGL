@@ -26,8 +26,17 @@ public :
 		cube
 	};
 
+	enum eShaderType
+	{
+		None,
+		UnLit,
+		Lit
+	};
+
 	void LoadModel(const std::string& path, const std::string& key);
-	void LoadShader(const Game* game, const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath);
+	void LoadShader(const Game* game,
+		const std::string& shaderKey, const std::string& vertexPath, const std::string& fragmentPath,
+		eShaderType shaderType);
 	void Clear();
 
 	const std::shared_ptr<Model> GetModel(const std::string& key) const;
