@@ -21,6 +21,8 @@ public:
 	const glm::mat4& GetProjMatrix();
 	const glm::vec3& GetPosition();
 	const glm::vec3& GetCameraFront();
+	float GetCameraNear() const;
+	float GetCameraFar() const;
 
 private :
 	const float MAX_CAMERA_FOV;
@@ -36,6 +38,8 @@ private :
 	float cameraYaw = -90.0f;
 	float cameraPitch = 0.0f;
 	float cameraFov = 45.0f;
+	float cameraNear = 0.1f;
+	float cameraFar = 100.0f;
 	bool firstMouseMove = true;
 
 	float lastMousePosX;

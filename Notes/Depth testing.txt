@@ -1,0 +1,14 @@
+depth test is comparing between depth value in depth buffer and z position value of fragment in screen-space.
+Vertex's position in fragment shader(where vertex position is in screen-space which is defined by viewport transform) is in 
+(x : (0 ~ Width), y : (0 ~ Height), z : (0~1));
+After fragment shader, openGL use z value of position(depth) to do depth test. If the current fragment's z value is less than depth value in depth buffer, 
+thay fragment is passed and be drawn.
+
+
+
+gl_FragCoord in fragment shader is the fragment's screen-space position(x, y, z)
+left-bottom is x : 0, y : 0 and z is depth value of fragment(0 ~ 1)
+
+but the depth value of fragment in screen-space is non-linearly transformed from view space's near-far value;
+For example, if near is 0.1f and far is 100.0f, they don't leanerly get transformed to 0 to 1.
+They get non-linear transform by projection matirx. 

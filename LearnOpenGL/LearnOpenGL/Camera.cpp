@@ -115,7 +115,7 @@ const glm::mat4& Camera::GetViewMatrix()
 const glm::mat4& Camera::GetProjMatrix()
 {
 	projMatrix = glm::mat4(1.0f);
-	projMatrix = glm::perspective(glm::radians(cameraFov), Game::SCREEN_WIDTH / Game::SCREEN_HEIGHT, 0.1f, 100.0f);
+	projMatrix = glm::perspective(glm::radians(cameraFov), Game::SCREEN_WIDTH / Game::SCREEN_HEIGHT, cameraNear, cameraFar);
 
 	return projMatrix;
 }
@@ -128,4 +128,14 @@ const glm::vec3& Camera::GetPosition()
 const glm::vec3& Camera::GetCameraFront()
 {
 	return cameraFront;
+}
+
+float Camera::GetCameraNear() const
+{
+	return cameraNear;
+}
+
+float Camera::GetCameraFar() const
+{
+	return cameraFar;
 }

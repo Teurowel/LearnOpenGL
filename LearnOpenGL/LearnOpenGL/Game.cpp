@@ -42,7 +42,7 @@ bool Game::Init()
 	InitResourceManager();
 
 	camera = std::make_shared<Camera>();
-	camera->SetPosition(glm::vec3(1.5f, 2.0f, 8.0f));
+	camera->SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
 	InitLights();
 	
@@ -95,7 +95,9 @@ void Game::Render()
 		shader->SetMatrix("view", camera->GetViewMatrix());
 		shader->SetMatrix("projection", camera->GetProjMatrix());
 		shader->SetVec3("viewPos", camera->GetPosition());
-
+		shader->SetFloat("cameraNear", camera->GetCameraNear());
+		shader->SetFloat("cameraFar", camera->GetCameraFar());
+		
 		//directional light set
 		shader->SetVec3("dirLight.direction", directionalLight->GetDirection());
 		shader->SetVec3("dirLight.ambient", directionalLight->GetAmbientColor());
@@ -178,6 +180,7 @@ void Game::InitSystem()
 	InitViewport(0, 0, (int)SCREEN_WIDTH, (int)SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_ALWAYS);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//wherever we move the mouse it won't be visible and it should not leave the window.
 }
@@ -264,18 +267,21 @@ void Game::InitObjects()
 	// 	pointLight->SetUnLitColor(pointLightVec[i]->GetDiffuseColor());
 	// }
 	
+	for(int i = 0; i < 50; ++i)
+	{
+		CreateObject(objectID,
+			resourceManager->GetModel("Backpack"),
+			"LitShader",
+			glm::vec3(i, 0.0f, -(i * 2)),
+			glm::vec3(1.0f, 1.0f, 1.0f));	
+	}
 	
-	CreateObject(objectID,
-		resourceManager->GetModel("Backpack"),
-		"LitShader",
-		glm::vec3(-2.0f, 0.0f, -2.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
 
-	CreateObject(objectID,
-		resourceManager->GetModel("Backpack"),
-		"LitShader",
-		glm::vec3(2.0f, 0.0f, -2.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f));
+	// CreateObject(objectID,
+	// 	resourceManager->GetModel("Backpack"),
+	// 	"LitShader",
+	// 	glm::vec3(1.0f, 0.0f, -2.0f),
+	// 	glm::vec3(1.0f, 1.0f, 1.0f));
 
 
 	// CreateObject(objectID,

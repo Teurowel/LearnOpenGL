@@ -7,7 +7,8 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 uniform vec3 viewPos;
-
+uniform float cameraNear;
+uniform float cameraFar;
 
 struct Material
 {
@@ -90,7 +91,13 @@ void main()
     resultColor += CalcSpotLight(spotLight, norm, fragPos, viewDir);
     
 
-    FragColor =  vec4(resultColor, 1.0f);
+    //FragColor =  vec4(resultColor, 1.0f);
+
+    float NDCDepth = gl_FragCoord.z * 2.0f - 1.0f; //From non-linear depth(0 ~ 1) in screen-space to NDC depth(-1 ~ 1)
+    float viewNearFarDepth = (2.0f * cameraNear * cameraFar) / (cameraFar + cameraNear - NDCDepth * (cameraFar - cameraNear)); //From NDC depth(-1 ~ 1) to ViewSpace linear depth(0.1 ~ 100) near to far
+    float colorDepth = viewNearFarDepth / cameraFar;    
+
+    FragColor =  vec4(vec3(colorDepth), 1.0f);
 }
 
 
