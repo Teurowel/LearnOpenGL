@@ -30,7 +30,8 @@ public :
 	{
 		None,
 		UnLit,
-		Lit
+		Lit,
+		DepthTesting
 	};
 
 	void LoadModel(const std::string& path, const std::string& key);

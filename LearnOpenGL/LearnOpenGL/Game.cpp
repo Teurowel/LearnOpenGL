@@ -176,6 +176,9 @@ void Game::InitResourceManager()
 	resourceManager->LoadShader(this,
 		"LitShader", "Asset/Shaders/LitVertexShader.vs", "Asset/Shaders/LitFragmentShader.fs",
 		ResourceManager::Lit);
+	resourceManager->LoadShader(this,
+		"DepthTestingShader", "Asset/Shaders/DepthTestingVertexShader.vs", "Asset/Shaders/DepthTestingFragmentShader.fs",
+		ResourceManager::DepthTesting);
 }
 
 void Game::InitLights()
@@ -264,6 +267,12 @@ void Game::InitObjects()
 		resourceManager->GetModel("Backpack"),
 		"LitShader",
 		glm::vec3(4.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f));
+
+	CreateObject(objectID,
+		resourceManager->GetModel("Backpack"),
+		"DepthTestingShader",
+		glm::vec3(8.0f, 0.0f, 0.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f));
 }
 

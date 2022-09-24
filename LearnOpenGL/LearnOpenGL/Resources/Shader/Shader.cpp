@@ -54,8 +54,6 @@ void Shader::Use()
 	SetMatrix("view", camera->GetViewMatrix());
 	SetMatrix("projection", camera->GetProjMatrix());
 	SetVec3("viewPos", camera->GetPosition());
-	SetFloat("cameraNear", camera->GetCameraNear());
-	SetFloat("cameraFar", camera->GetCameraFar());
 }
 
 void Shader::UnUse()
